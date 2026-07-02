@@ -63,6 +63,45 @@ function voiceBadges(v) {
   return b;
 }
 
+// ============================================================
+//  Statische Audiodateien (lokal, liegen in <projekt>/public/audio/…)
+//  Vite serviert alles aus public/ direkt unter "/". Datei
+//  public/audio/harakat/ba_fatha.mp3  ->  URL  /audio/harakat/ba_fatha.mp3
+//
+//  Reihenfolge der Wiedergabe im ganzen Trainer:
+//    1) statische Datei (falls vorhanden)   -> beste Qualität
+//    2) Browser-TTS                          -> nur Fallback
+//
+//  Die beiden Schalter erst auf true stellen, wenn die Dateien wirklich
+//  erzeugt und abgelegt sind (siehe scripts/generate-audio.mjs). Solange
+//  false laeuft direkt TTS. Auch bei true bleibt TTS der Fallback, falls
+//  eine einzelne Datei nicht laedt (onerror).
+// ============================================================
+const AUDIO_BASE = "/audio";
+const HARAKAT_AUDIO_ENABLED = false;
+const WORD_AUDIO_ENABLED = false;
+
+// Dateinamen-tauglicher ASCII-Slug aus einer Transliteration.
+// Muss identisch zur slugify-Funktion im Generier-Skript sein, sonst
+// passen die Dateinamen nicht zusammen.
+function slugify(s) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Diakritika weg: ā->a, ḥ->h, ṣ->s …
+    .replace(/[ʿʾ'’`]/g, "")         // Hamza-/Ain-Zeichen weg
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function harakatAudioSrc(letterKey, harakaId) {
+  return `${AUDIO_BASE}/harakat/${letterKey}_${harakaId}.mp3`;
+}
+function wordAudioSrc(item) {
+  if (item.audio) return item.audio; // explizit gesetzter Pfad hat Vorrang
+  return `${AUDIO_BASE}/words/${slugify(item.tr)}.mp3`;
+}
+
 // Grunddaten: 28 Buchstaben + Lam-Alif. connectsAfter=false -> nur isoliert/final.
 const RAW = [
   ["alif", "ا", false, "Alif", "langes a / Träger"],
@@ -127,15 +166,16 @@ const POS_LABEL = {
 // ---- Daten fuer das Harakat-Modul ----
 // Saubere Kurz-Transliteration je Konsonant (fuer die Lese-Optionen).
 // Alif/Lam-Alif ausgelassen, da sie ohne Hamza kaum eine reine Haraka tragen.
+// key = ASCII-Kennung fuer Dateinamen (z.B. ba_fatha.mp3), passend zu RAW.
 const HARAKAT_LETTERS = [
-  { base: "ب", tr: "b" }, { base: "ت", tr: "t" }, { base: "ث", tr: "th" },
-  { base: "ج", tr: "j" }, { base: "ح", tr: "ḥ" }, { base: "خ", tr: "kh" },
-  { base: "د", tr: "d" }, { base: "ر", tr: "r" }, { base: "س", tr: "s" },
-  { base: "ش", tr: "sh" }, { base: "ص", tr: "ṣ" }, { base: "ط", tr: "ṭ" },
-  { base: "ع", tr: "ʿ" }, { base: "ف", tr: "f" }, { base: "ق", tr: "q" },
-  { base: "ك", tr: "k" }, { base: "ل", tr: "l" }, { base: "م", tr: "m" },
-  { base: "ن", tr: "n" }, { base: "ه", tr: "h" }, { base: "و", tr: "w" },
-  { base: "ي", tr: "y" },
+  { key: "ba", base: "ب", tr: "b" }, { key: "ta", base: "ت", tr: "t" }, { key: "tha", base: "ث", tr: "th" },
+  { key: "jim", base: "ج", tr: "j" }, { key: "hah", base: "ح", tr: "ḥ" }, { key: "kha", base: "خ", tr: "kh" },
+  { key: "dal", base: "د", tr: "d" }, { key: "ra", base: "ر", tr: "r" }, { key: "sin", base: "س", tr: "s" },
+  { key: "shin", base: "ش", tr: "sh" }, { key: "sad", base: "ص", tr: "ṣ" }, { key: "tah", base: "ط", tr: "ṭ" },
+  { key: "ain", base: "ع", tr: "ʿ" }, { key: "fa", base: "ف", tr: "f" }, { key: "qaf", base: "ق", tr: "q" },
+  { key: "kaf", base: "ك", tr: "k" }, { key: "lam", base: "ل", tr: "l" }, { key: "mim", base: "م", tr: "m" },
+  { key: "nun", base: "ن", tr: "n" }, { key: "ha", base: "ه", tr: "h" }, { key: "waw", base: "و", tr: "w" },
+  { key: "ya", base: "ي", tr: "y" },
 ];
 
 const HARAKAT = [
@@ -358,6 +398,7 @@ function makeHarakatQuestion(mode) {
   const L = randOf(HARAKAT_LETTERS);
   const h = randOf(HARAKAT);
   const glyph = L.base + h.mark;
+  const audioSrc = HARAKAT_AUDIO_ENABLED ? harakatAudioSrc(L.key, h.id) : null;
 
   if (mode === "read2syllable") {
     // Zeichen zeigen -> richtige Silbe (a/i/u) waehlen. Distraktoren: gleicher
@@ -372,6 +413,7 @@ function makeHarakatQuestion(mode) {
     return {
       audio: false,
       speakText: glyph,
+      audioSrc,
       badge: null,
       prompt: glyph,
       promptArabic: true,
@@ -390,6 +432,7 @@ function makeHarakatQuestion(mode) {
   return {
     audio: true,
     speakText: glyph,
+    audioSrc,
     badge: null,
     prompt: null,
     promptArabic: false,
@@ -561,19 +604,39 @@ export default function App() {
     if (audioElRef.current) audioElRef.current.pause();
   }
 
-  // Spielt die echte Rezitation eines Verses; Woerter ohne surah/ayah
-  // (Sukun/Shadda/Einzelwoerter) fallen automatisch auf TTS zurueck.
+  // Kern der Audio-Strategie: erst statische Datei (src), bei jedem Fehler
+  // (nicht vorhanden, Netzwerk, Format) faellt es auf Browser-TTS zurueck.
+  function playFileOrTTS(src, fallbackText) {
+    const audio = audioElRef.current;
+    if (src && audio) {
+      audio.pause();
+      audio.onerror = () => speak(fallbackText);
+      audio.src = src;
+      const p = audio.play();
+      if (p && p.catch) p.catch(() => speak(fallbackText));
+    } else {
+      speak(fallbackText);
+    }
+  }
+
+  // Fuer Auswahl-Module (Buchstaben/Harakat): nutzt die statische Datei der
+  // Frage, sonst TTS. q.audioSrc ist null, solange die Dateien nicht aktiv sind.
+  function playPrompt(qq) {
+    playFileOrTTS(qq.audioSrc, qq.speakText);
+  }
+
+  // Fuer Lese-Module. Reihenfolge:
+  //   1) Vers -> echte Rezitation (everyayah)
+  //   2) Wort -> statische Datei (falls WORD_AUDIO_ENABLED)
+  //   3) TTS-Fallback
   function playReadingAudio(item) {
     if (item && item.surah && item.ayah) {
-      const audio = audioElRef.current;
-      if (audio) {
-        audio.pause();
-        audio.onerror = () => speak(item.ar);
-        audio.src = ayahAudioUrl(reciterFolder, item.surah, item.ayah);
-        const p = audio.play();
-        if (p && p.catch) p.catch(() => speak(item.ar));
-        return;
-      }
+      playFileOrTTS(ayahAudioUrl(reciterFolder, item.surah, item.ayah), item.ar);
+      return;
+    }
+    if (WORD_AUDIO_ENABLED) {
+      playFileOrTTS(wordAudioSrc(item), item.ar);
+      return;
     }
     speak(item.ar);
   }
@@ -630,7 +693,7 @@ export default function App() {
       const first = curMod.make(mode);
       setQ(first);
       setScreen("play");
-      if (first.audio) setTimeout(() => speak(first.speakText), 350);
+      if (first.audio) setTimeout(() => playPrompt(first), 350);
     }
   }
 
@@ -640,7 +703,7 @@ export default function App() {
     setQ(nq);
     setChosen(null);
     setLocked(false);
-    if (nq.audio) setTimeout(() => speak(nq.speakText), 250);
+    if (nq.audio) setTimeout(() => playPrompt(nq), 250);
   }
 
   function choose(opt, idx) {
@@ -799,7 +862,7 @@ export default function App() {
             locked={locked}
             onChoose={choose}
             onFinish={finish}
-            onReplay={() => speak(q.speakText)}
+            onReplay={() => playPrompt(q)}
             correct={correct}
             wrong={wrong}
             streak={streak}
