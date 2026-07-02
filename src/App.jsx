@@ -20,6 +20,49 @@ const FATHA = "\u064E"; // a
 const KASRA = "\u0650"; // i
 const DAMMA = "\u064F"; // u
 
+// ============================================================
+//  Echte Rezitations-Audios (everyayah.com, verifizierte Ordnernamen)
+//  Dateimuster: /data/{Ordner}/{Sure 3-stellig}{Ayah 3-stellig}.mp3
+//  z.B. Sure 67 Ayah 1 -> 067001.mp3. Kein API-Key noetig.
+//  Das ist echte Qari-Rezitation, keine synthetische Stimme — die
+//  bestmoegliche Audioqualitaet fuer die Vers-Pakete.
+// ============================================================
+const RECITERS = [
+  { id: "alafasy", label: "Mishary Al-Afasy", folder: "Alafasy_128kbps", note: "Klar, populär, guter Standard" },
+  { id: "husary", label: "Mahmoud Al-Husary", folder: "Husary_128kbps", note: "Sehr deutliche Aussprache, oft für Lernende empfohlen" },
+  { id: "abdulbasit", label: "Abdul Basit (Murattal)", folder: "Abdul_Basit_Murattal_192kbps", note: "Ruhiges Tempo" },
+  { id: "sudais", label: "Abdurrahman As-Sudais", folder: "Abdurrahmaan_As-Sudais_192kbps", note: "Imam der Haram-Moschee Mekka" },
+];
+
+function pad3(n) {
+  return String(n).padStart(3, "0");
+}
+function ayahAudioUrl(folder, surah, ayah) {
+  return `https://everyayah.com/data/${folder}/${pad3(surah)}${pad3(ayah)}.mp3`;
+}
+// Versieht ein Array von Vers-Objekten mit surah/ayah-Nummern, damit
+// daraus automatisch die Audio-URL gebaut werden kann.
+function tagAyat(items, surah, startAyah) {
+  return items.map((it, i) => ({ ...it, surah, ayah: startAyah + i }));
+}
+
+// ---- TTS-Stimmenauswahl: Heuristik fuer "beste verfuegbare" Systemstimme ----
+const VOICE_MALE_HINTS = /maged|male|tarik|hamza|mann|rasheed|ahmad|omar|yousef|hamed|khalid/i;
+const VOICE_QUALITY_HINTS = /enhanced|premium|neural|natural|plus|wavenet/i;
+
+function voiceScore(v) {
+  let s = 0;
+  if (VOICE_QUALITY_HINTS.test(v.name)) s += 5;
+  if (VOICE_MALE_HINTS.test(v.name)) s += 2;
+  return s;
+}
+function voiceBadges(v) {
+  const b = [];
+  if (VOICE_QUALITY_HINTS.test(v.name)) b.push("bessere Qualität");
+  if (VOICE_MALE_HINTS.test(v.name)) b.push("männlich (vermutet)");
+  return b;
+}
+
 // Grunddaten: 28 Buchstaben + Lam-Alif. connectsAfter=false -> nur isoliert/final.
 const RAW = [
   ["alif", "ا", false, "Alif", "langes a / Träger"],
@@ -163,26 +206,26 @@ const WORDS_QALAM = [
 ];
 
 // --- Surat al-Mulk (67), Ayat 1-5 ---
-const MULK_1_5 = [
+const MULK_1_5 = tagAyat([
   { ar: "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ", tr: "tabāraka lladhī bi-yadihi l-mulku wa-huwa ʿalā kulli shayʾin qadīr", de: "Gesegnet ist Der, in dessen Hand die Herrschaft liegt; und Er hat Macht über alle Dinge." },
   { ar: "الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ", tr: "alladhī khalaqa l-mawta wa-l-ḥayāta li-yabluwakum ayyukum aḥsanu ʿamalā, wa-huwa l-ʿazīzu l-ghafūr", de: "Der Tod und Leben erschuf, um euch zu prüfen, wer von euch am besten handelt. Und Er ist der Allmächtige, der Allvergebende." },
   { ar: "الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِن فُطُورٍ", tr: "alladhī khalaqa sabʿa samāwātin ṭibāqā …", de: "Der sieben Himmel in Schichten erschuf. Du siehst in der Schöpfung des Allerbarmers keinen Fehler. Wende den Blick zurück: Siehst du irgendeinen Riss?" },
   { ar: "ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ", tr: "thumma rjiʿi l-baṣara karratayni …", de: "Dann wende den Blick ein zweites Mal zurück: Der Blick kehrt zu dir zurück, ermattet und erschöpft." },
   { ar: "وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ", tr: "wa-laqad zayyannā s-samāʾa d-dunyā bi-maṣābīḥ …", de: "Wir haben den untersten Himmel mit Leuchten geschmückt und sie zu Wurfgeschossen gegen die Satane gemacht; und für sie haben Wir die Strafe des Feuers bereitet." },
-];
+], 67, 1);
 
 // --- Surat al-Mulk (67), Ayat 6-11 ---
-const MULK_6_11 = [
+const MULK_6_11 = tagAyat([
   { ar: "وَلِلَّذِينَ كَفَرُوا بِرَبِّهِمْ عَذَابُ جَهَنَّمَ ۖ وَبِئْسَ الْمَصِيرُ", tr: "wa-li-lladhīna kafarū bi-rabbihim ʿadhābu jahannam …", de: "Und für die, die ihren Herrn verleugnen, ist die Strafe der Hölle — und ein schlimmes Ende ist das." },
   { ar: "إِذَا أُلْقُوا فِيهَا سَمِعُوا لَهَا شَهِيقًا وَهِيَ تَفُورُ", tr: "idhā ulqū fīhā samiʿū lahā shahīqan wa-hiya tafūr", de: "Wenn sie hineingeworfen werden, hören sie ihr Aufheulen, während sie brodelt." },
   { ar: "تَكَادُ تَمَيَّزُ مِنَ الْغَيْظِ ۖ كُلَّمَا أُلْقِيَ فِيهَا فَوْجٌ سَأَلَهُمْ خَزَنَتُهَا أَلَمْ يَأْتِكُمْ نَذِيرٌ", tr: "takādu tamayyazu mina l-ghayẓ …", de: "Fast birst sie vor Wut. Jedes Mal, wenn eine Schar hineingeworfen wird, fragen ihre Wächter sie: Ist zu euch kein Warner gekommen?" },
   { ar: "قَالُوا بَلَىٰ قَدْ جَاءَنَا نَذِيرٌ فَكَذَّبْنَا وَقُلْنَا مَا نَزَّلَ اللَّهُ مِن شَيْءٍ إِنْ أَنتُمْ إِلَّا فِي ضَلَالٍ كَبِيرٍ", tr: "qālū balā qad jāʾanā nadhīr …", de: "Sie sagen: Doch, es kam ein Warner zu uns, aber wir leugneten und sagten: Gott hat nichts herabgesandt; ihr seid nur in großem Irrtum." },
   { ar: "وَقَالُوا لَوْ كُنَّا نَسْمَعُ أَوْ نَعْقِلُ مَا كُنَّا فِي أَصْحَابِ السَّعِيرِ", tr: "wa-qālū law kunnā nasmaʿu aw naʿqilu …", de: "Und sie sagen: Hätten wir nur gehört oder verstanden, wären wir nicht unter den Bewohnern des Feuers." },
   { ar: "فَاعْتَرَفُوا بِذَنبِهِمْ فَسُحْقًا لِّأَصْحَابِ السَّعِيرِ", tr: "fa-ʿtarafū bi-dhanbihim fa-suḥqan li-aṣḥābi s-saʿīr", de: "So gestehen sie ihre Sünde ein. Fort denn mit den Bewohnern des Feuers!" },
-];
+], 67, 6);
 
 // --- Surat al-Qalam (68), Ayat 1-16 ---
-const QALAM_1_16 = [
+const QALAM_1_16 = tagAyat([
   { ar: "نٓ ۚ وَالْقَلَمِ وَمَا يَسْطُرُونَ", tr: "nūn, wa-l-qalami wa-mā yasṭurūn", de: "Nūn. Beim Stift und bei dem, was sie niederschreiben." },
   { ar: "مَا أَنتَ بِنِعْمَةِ رَبِّكَ بِمَجْنُونٍ", tr: "mā anta bi-niʿmati rabbika bi-majnūn", de: "Du bist, dank der Gnade deines Herrn, kein Besessener." },
   { ar: "وَإِنَّ لَكَ لَأَجْرًا غَيْرَ مَمْنُونٍ", tr: "wa-inna laka la-ajran ghayra mamnūn", de: "Und dir wird gewiss ein nie endender Lohn zuteil." },
@@ -199,10 +242,10 @@ const QALAM_1_16 = [
   { ar: "أَن كَانَ ذَا مَالٍ وَبَنِينَ", tr: "an kāna dhā mālin wa-banīn", de: "nur weil er Vermögen und Söhne besitzt." },
   { ar: "إِذَا تُتْلَىٰ عَلَيْهِ آيَاتُنَا قَالَ أَسَاطِيرُ الْأَوَّلِينَ", tr: "idhā tutlā ʿalayhi āyātunā qāla asāṭīru l-awwalīn", de: "Wenn ihm Unsere Zeichen verlesen werden, sagt er: Fabeln der Früheren!" },
   { ar: "سَنَسِمُهُ عَلَى الْخُرْطُومِ", tr: "sanasimuhu ʿalā l-khurṭūm", de: "Wir werden ihn auf der Nase brandmarken." },
-];
+], 68, 1);
 
 // --- Surat al-Haqqa (69), Ayat 1-10 ---
-const HAQQA_1_10 = [
+const HAQQA_1_10 = tagAyat([
   { ar: "الْحَاقَّةُ", tr: "al-ḥāqqa", de: "Die Unausweichliche." },
   { ar: "مَا الْحَاقَّةُ", tr: "mā l-ḥāqqa", de: "Was ist die Unausweichliche?" },
   { ar: "وَمَا أَدْرَاكَ مَا الْحَاقَّةُ", tr: "wa-mā adrāka mā l-ḥāqqa", de: "Und was lässt dich wissen, was die Unausweichliche ist?" },
@@ -213,13 +256,13 @@ const HAQQA_1_10 = [
   { ar: "فَهَلْ تَرَىٰ لَهُم مِّن بَاقِيَةٍ", tr: "fa-hal tarā lahum min bāqiya", de: "Siehst du von ihnen noch irgendetwas übrig?" },
   { ar: "وَجَاءَ فِرْعَوْنُ وَمَن قَبْلَهُ وَالْمُؤْتَفِكَاتُ بِالْخَاطِئَةِ", tr: "wa-jāʾa firʿawnu wa-man qablahu wa-l-muʾtafikātu bi-l-khāṭiʾa", de: "Und Pharao kam, und die vor ihm, und die umgestürzten Städte, mit dem Vergehen." },
   { ar: "فَعَصَوْا رَسُولَ رَبِّهِمْ فَأَخَذَهُمْ أَخْذَةً رَّابِيَةً", tr: "fa-ʿaṣaw rasūla rabbihim fa-akhadhahum akhdhatan rābiya", de: "Sie widersetzten sich dem Gesandten ihres Herrn, da ergriff Er sie mit übermäßigem Griff." },
-];
+], 69, 1);
 
 // --- Surat al-Maʿārij (70): AUSZUG (Ayat 1-10) — noch zu vervollstaendigen ---
 // Die Sure hat 44 Verse. Ich trage hier bewusst nur die ersten als
 // gepruefte Grundlage ein und lasse den Rest offen, statt 44 Verse aus
 // dem Gedaechtnis zu erfinden. Rest aus tanzil.net / api.quran.com ergaenzen.
-const MAARIJ_EXCERPT = [
+const MAARIJ_EXCERPT = tagAyat([
   { ar: "سَأَلَ سَائِلٌ بِعَذَابٍ وَاقِعٍ", tr: "saʾala sāʾilun bi-ʿadhābin wāqiʿ", de: "Ein Fragender fragte nach einer eintreffenden Strafe," },
   { ar: "لِّلْكَافِرِينَ لَيْسَ لَهُ دَافِعٌ", tr: "li-l-kāfirīna laysa lahu dāfiʿ", de: "für die Ungläubigen — niemand kann sie abwehren —" },
   { ar: "مِّنَ اللَّهِ ذِي الْمَعَارِجِ", tr: "mina llāhi dhī l-maʿārij", de: "von Gott, dem Herrn der Aufstiegswege." },
@@ -230,7 +273,7 @@ const MAARIJ_EXCERPT = [
   { ar: "يَوْمَ تَكُونُ السَّمَاءُ كَالْمُهْلِ", tr: "yawma takūnu s-samāʾu ka-l-muhl", de: "Am Tag, da der Himmel wie geschmolzenes Erz wird," },
   { ar: "وَتَكُونُ الْجِبَالُ كَالْعِهْنِ", tr: "wa-takūnu l-jibālu ka-l-ʿihn", de: "und die Berge wie gefärbte Wolle werden," },
   { ar: "وَلَا يَسْأَلُ حَمِيمٌ حَمِيمًا", tr: "wa-lā yasʾalu ḥamīmun ḥamīmā", de: "und kein Vertrauter einen Vertrauten fragt." },
-];
+], 70, 1);
 
 // 3 Suren am Stueck: aus den oben abgedeckten Ayat zusammengesetzt
 // (al-Mulk 1-11, al-Qalam 1-16, al-Haqqa 1-10 — nicht die vollen Suren).
@@ -429,7 +472,9 @@ export default function App() {
   const curMod = getModule(moduleId);
   const isReading = curMod.kind === "reading";
   const curMode = !isReading ? curMod.modes.find((m) => m.id === mode) : null;
-  const needsVoice = (curMode && curMode.audio) || isReading;
+  // "ayat" hat echte Rezitation -> eigener Rezitator-Picker statt TTS-Stimmenliste.
+  const needsReciter = isReading && curMod.id === "ayat";
+  const needsVoice = (curMode && curMode.audio) || (isReading && curMod.id === "words");
 
   // Auswahl-Modul-Zustand
   const [q, setQ] = useState(null);
@@ -452,10 +497,15 @@ export default function App() {
   const [elapsed, setElapsed] = useState(0);
   const [finalMs, setFinalMs] = useState(0);
 
-  // ---- Stimmen (Text-to-Speech) ----
+  // ---- Stimmen (Text-to-Speech, nur noch fuer Buchstaben/Harakat/Woerter) ----
   const [voices, setVoices] = useState([]);
   const [voiceURI, setVoiceURI] = useState(null);
   const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
+
+  // ---- Echte Rezitation (Verse & Suren) ----
+  const [reciterId, setReciterId] = useState(RECITERS[0].id);
+  const reciterFolder = (RECITERS.find((r) => r.id === reciterId) || RECITERS[0]).folder;
+  const audioElRef = useRef(typeof window !== "undefined" ? new Audio() : null);
 
   useEffect(() => {
     const synth = synthRef.current;
@@ -463,11 +513,11 @@ export default function App() {
     const load = () => {
       const all = synth.getVoices();
       const arabic = all.filter((v) => /ar(\b|[-_])/i.test(v.lang));
-      setVoices(arabic);
-      if (arabic.length && !voiceURI) {
-        const maleHints = /maged|male|tarik|hamza|mann|rasheed|ahmad|omar/i;
-        const male = arabic.find((v) => maleHints.test(v.name));
-        setVoiceURI((male || arabic[0]).voiceURI);
+      // Beste vermutete Stimme zuerst (Enhanced/Premium/Neural + maennliche Namenshinweise)
+      const ranked = [...arabic].sort((a, b) => voiceScore(b) - voiceScore(a));
+      setVoices(ranked);
+      if (ranked.length && !voiceURI) {
+        setVoiceURI(ranked[0].voiceURI);
       }
     };
     load();
@@ -494,6 +544,51 @@ export default function App() {
     synth.speak(u);
   }
 
+  // Spielt eine bestimmte Stimme sofort probehalber ab (unabhaengig vom
+  // aktuellen State), damit man beim Antippen in der Liste direkt vergleicht.
+  function previewVoice(v) {
+    const synth = synthRef.current;
+    if (!synth) return;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ");
+    u.voice = v;
+    u.lang = v.lang || "ar-SA";
+    u.rate = 0.85;
+    synth.speak(u);
+  }
+
+  function stopAudio() {
+    if (audioElRef.current) audioElRef.current.pause();
+  }
+
+  // Spielt die echte Rezitation eines Verses; Woerter ohne surah/ayah
+  // (Sukun/Shadda/Einzelwoerter) fallen automatisch auf TTS zurueck.
+  function playReadingAudio(item) {
+    if (item && item.surah && item.ayah) {
+      const audio = audioElRef.current;
+      if (audio) {
+        audio.pause();
+        audio.onerror = () => speak(item.ar);
+        audio.src = ayahAudioUrl(reciterFolder, item.surah, item.ayah);
+        const p = audio.play();
+        if (p && p.catch) p.catch(() => speak(item.ar));
+        return;
+      }
+    }
+    speak(item.ar);
+  }
+
+  // Beispielhoerprobe fuer den gewaehlten Rezitator (Sure 1, Ayah 1 —
+  // existiert bei jedem Rezitator zuverlaessig).
+  function testReciter() {
+    const audio = audioElRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.onerror = () => {};
+    audio.src = ayahAudioUrl(reciterFolder, 1, 1);
+    audio.play().catch(() => {});
+  }
+
   // ---- Timer (versteckt, laeuft ab Start) ----
   useEffect(() => {
     if (screen !== "play" || startTs == null) return;
@@ -518,6 +613,7 @@ export default function App() {
 
   function startGame() {
     resetStats();
+    stopAudio();
     const ts = Date.now();
     setStartTs(ts);
     setElapsed(0);
@@ -568,6 +664,7 @@ export default function App() {
 
   // ---- Lese-Modul ----
   function readingRate(ok) {
+    stopAudio();
     const item = rQueue[rIdx];
     setAnswered((n) => n + 1);
     if (ok) {
@@ -596,6 +693,7 @@ export default function App() {
   function finish() {
     setFinalMs(startTs ? Date.now() - startTs : 0);
     if (synthRef.current) synthRef.current.cancel();
+    stopAudio();
     setScreen("result");
   }
 
@@ -683,8 +781,12 @@ export default function App() {
             voices={voices}
             voiceURI={voiceURI}
             setVoiceURI={setVoiceURI}
+            onPreviewVoice={previewVoice}
+            needsReciter={needsReciter}
+            reciterId={reciterId}
+            setReciterId={setReciterId}
+            onTestReciter={testReciter}
             onStart={startGame}
-            onTestVoice={() => speak("ع")}
           />
         )}
 
@@ -715,7 +817,7 @@ export default function App() {
             revealed={revealed}
             onReveal={() => setRevealed(true)}
             onRate={readingRate}
-            onSpeak={() => speak(rItem.ar)}
+            onSpeak={() => playReadingAudio(rItem)}
             onFinish={finish}
             correct={correct}
             wrong={wrong}
@@ -748,7 +850,9 @@ export default function App() {
 function StartScreen({
   C, moduleId, onSelectModule, curMod, isReading,
   mode, setMode, packId, setPackId,
-  needsVoice, voices, voiceURI, setVoiceURI, onStart, onTestVoice,
+  needsVoice, voices, voiceURI, setVoiceURI, onPreviewVoice,
+  needsReciter, reciterId, setReciterId, onTestReciter,
+  onStart,
 }) {
   const card = {
     background: C.panel,
@@ -824,7 +928,43 @@ function StartScreen({
         </div>
       )}
 
-      {/* Stimme (fuer Laut-Modi + optional zum Anhoeren beim Lesen) */}
+      {/* Rezitator (fuer Vers-Pakete: echte Rezitation statt TTS) */}
+      {needsReciter && (
+        <div style={card}>
+          <div style={{ fontSize: 13, color: C.sub, marginBottom: 10, fontWeight: 600 }}>
+            REZITATOR WÄHLEN
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+            {RECITERS.map((r) => (
+              <button key={r.id} style={pickBtn(reciterId === r.id)} onClick={() => setReciterId(r.id)}>
+                <div style={{ fontWeight: 700, fontSize: 15 }}>{r.label}</div>
+                <div style={{ fontSize: 12.5, color: C.sub, marginTop: 3 }}>{r.note}</div>
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={onTestReciter}
+            style={{
+              padding: "10px 16px",
+              borderRadius: 10,
+              border: `1px solid ${C.line}`,
+              background: C.panel2,
+              color: C.gold,
+              cursor: "pointer",
+              fontSize: 14,
+            }}
+          >
+            ▶ Beispiel hören
+          </button>
+          <p style={{ margin: "10px 0 0", fontSize: 12, color: C.sub, lineHeight: 1.5 }}>
+            Echte Qari-Rezitation, keine synthetische Stimme — die beste verfügbare
+            Audioqualität für die Verse.
+          </p>
+        </div>
+      )}
+
+      {/* Stimme (TTS) — nur fuer Buchstaben, Harakat und einzelne Woerter,
+          da es dafuer keine echte Rezitation gibt. */}
       {needsVoice && (
         <div style={card}>
           <div style={{ fontSize: 13, color: C.sub, marginBottom: 10, fontWeight: 600 }}>
@@ -840,47 +980,56 @@ function StartScreen({
               <p style={{ margin: 0, fontSize: 13.5, color: C.sub, lineHeight: 1.5 }}>
                 Keine arabische Stimme auf diesem Gerät gefunden. Unter iOS:
                 Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen →
-                Arabisch → „Maged" (männlich) laden. Der Laut-Modus funktioniert
-                erst dann.
+                Arabisch → „Maged" laden (am besten die „Enhanced"-Variante, falls
+                verfügbar — deutlich besser als die Standardstimme).
               </p>
             )
           ) : (
-            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              <select
-                value={voiceURI || ""}
-                onChange={(e) => setVoiceURI(e.target.value)}
-                style={{
-                  flex: 1,
-                  minWidth: 200,
-                  padding: "11px 12px",
-                  borderRadius: 10,
-                  background: C.panel2,
-                  color: C.ink,
-                  border: `1px solid ${C.line}`,
-                  fontSize: 14,
-                }}
-              >
-                {voices.map((v) => (
-                  <option key={v.voiceURI} value={v.voiceURI}>
-                    {v.name} ({v.lang})
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={onTestVoice}
-                style={{
-                  padding: "11px 16px",
-                  borderRadius: 10,
-                  border: `1px solid ${C.line}`,
-                  background: C.panel2,
-                  color: C.ink,
-                  cursor: "pointer",
-                  fontSize: 14,
-                }}
-              >
-                ▶ Test
-              </button>
-            </div>
+            <>
+              <div style={{ display: "grid", gap: 8, maxHeight: 260, overflowY: "auto" }}>
+                {voices.map((v) => {
+                  const active = voiceURI === v.voiceURI;
+                  const badges = voiceBadges(v);
+                  return (
+                    <button
+                      key={v.voiceURI}
+                      onClick={() => {
+                        setVoiceURI(v.voiceURI);
+                        onPreviewVoice(v);
+                      }}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: 10,
+                        padding: "10px 12px",
+                        borderRadius: 10,
+                        border: `1px solid ${active ? C.green : C.line}`,
+                        background: active ? "rgba(63,174,107,0.14)" : C.panel2,
+                        color: C.ink,
+                        cursor: "pointer",
+                        textAlign: "left",
+                      }}
+                    >
+                      <span>
+                        <div style={{ fontWeight: 600, fontSize: 13.5 }}>{v.name}</div>
+                        <div style={{ fontSize: 11.5, color: C.sub, marginTop: 2 }}>
+                          {v.lang}
+                          {badges.length ? " · " + badges.join(", ") : ""}
+                        </div>
+                      </span>
+                      <span style={{ fontSize: 18, color: C.gold, flexShrink: 0 }}>▶</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p style={{ margin: "10px 0 0", fontSize: 12, color: C.sub, lineHeight: 1.5 }}>
+                Antippen wählt die Stimme und spielt sie direkt zum Vergleich ab. Die Liste
+                ist auf die auf deinem Gerät installierten Stimmen begrenzt — bessere/mehr
+                Stimmen installierst du im System (iOS: Einstellungen → Bedienungshilfen →
+                Gesprochene Inhalte → Stimmen → Arabisch → „Enhanced"-Variante laden).
+              </p>
+            </>
           )}
         </div>
       )}
