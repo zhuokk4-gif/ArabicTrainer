@@ -504,6 +504,34 @@ function getModule(id) {
   return CHOICE_MODULES[id] || READING_MODULES[id];
 }
 
+// ============================================================
+//  Fortschritts-Statistik (localStorage, nur auf diesem Geraet)
+//  Ein Datensatz je Modus/Paket:
+//    { runs, answered, correct, bestStreak, lastTs }
+//  Gesamt-Trefferquote = correct / answered ueber alle Durchgaenge.
+// ============================================================
+const STATS_LS_KEY = "arabtrainer:stats:v1";
+
+function loadAllStats() {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(window.localStorage.getItem(STATS_LS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+function saveAllStats(obj) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STATS_LS_KEY, JSON.stringify(obj));
+  } catch {
+    // localStorage kann blockiert sein (Privatmodus) -> still ignorieren
+  }
+}
+function statAccuracyOf(rec) {
+  return rec && rec.answered > 0 ? Math.round((rec.correct / rec.answered) * 100) : 0;
+}
+
 export default function App() {
   const [screen, setScreen] = useState("start"); // start | play | result
 
@@ -539,6 +567,14 @@ export default function App() {
   const [startTs, setStartTs] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [finalMs, setFinalMs] = useState(0);
+
+  // Gespeicherte Statistik (localStorage), je Modus/Paket
+  const [statsMap, setStatsMap] = useState(() => loadAllStats());
+  const statKey = isReading ? `${moduleId}:${packId}` : `${moduleId}:${mode}`;
+  const curStat = statsMap[statKey] || null;
+  const statLabel = isReading
+    ? (curMod.packs.find((p) => p.id === packId) || {}).label || curMod.title
+    : (curMode && curMode.label) || curMod.title;
 
   // ---- Stimmen (Text-to-Speech, nur noch fuer Buchstaben/Harakat/Woerter) ----
   const [voices, setVoices] = useState([]);
@@ -757,7 +793,35 @@ export default function App() {
     setFinalMs(startTs ? Date.now() - startTs : 0);
     if (synthRef.current) synthRef.current.cancel();
     stopAudio();
+    // Statistik nur zusammenfuehren, wenn wirklich etwas beantwortet wurde
+    if (answered > 0) {
+      setStatsMap((prev) => {
+        const old = prev[statKey] || { runs: 0, answered: 0, correct: 0, bestStreak: 0 };
+        const merged = {
+          ...prev,
+          [statKey]: {
+            runs: old.runs + 1,
+            answered: old.answered + answered,
+            correct: old.correct + correct,
+            bestStreak: Math.max(old.bestStreak, bestStreak),
+            lastTs: Date.now(),
+          },
+        };
+        saveAllStats(merged);
+        return merged;
+      });
+    }
     setScreen("result");
+  }
+
+  // Loescht die gespeicherte Statistik des aktuell gewaehlten Modus/Pakets.
+  function resetCurrentStats() {
+    setStatsMap((prev) => {
+      const merged = { ...prev };
+      delete merged[statKey];
+      saveAllStats(merged);
+      return merged;
+    });
   }
 
   const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
@@ -850,6 +914,9 @@ export default function App() {
             setReciterId={setReciterId}
             onTestReciter={testReciter}
             onStart={startGame}
+            curStat={curStat}
+            statLabel={statLabel}
+            onResetStats={resetCurrentStats}
           />
         )}
 
@@ -898,6 +965,8 @@ export default function App() {
             answered={answered}
             accuracy={accuracy}
             bestStreak={bestStreak}
+            curStat={curStat}
+            statLabel={statLabel}
             onRestart={() => setScreen("start")}
             onAgain={startGame}
           />
@@ -915,7 +984,7 @@ function StartScreen({
   mode, setMode, packId, setPackId,
   needsVoice, voices, voiceURI, setVoiceURI, onPreviewVoice,
   needsReciter, reciterId, setReciterId, onTestReciter,
-  onStart,
+  onStart, curStat, statLabel, onResetStats,
 }) {
   const card = {
     background: C.panel,
@@ -1096,6 +1165,69 @@ function StartScreen({
           )}
         </div>
       )}
+
+      {/* Gespeicherte Statistik fuer die aktuelle Auswahl */}
+      <div style={{ ...card, marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: curStat ? 12 : 0,
+          }}
+        >
+          <div style={{ fontSize: 13, color: C.sub, fontWeight: 600 }}>
+            DEINE STATISTIK · {statLabel}
+          </div>
+          {curStat && (
+            <button
+              onClick={onResetStats}
+              style={{
+                fontSize: 12,
+                color: C.sub,
+                background: "transparent",
+                border: `1px solid ${C.line}`,
+                borderRadius: 8,
+                padding: "4px 10px",
+                cursor: "pointer",
+              }}
+            >
+              zurücksetzen
+            </button>
+          )}
+        </div>
+        {curStat ? (
+          <div style={{ display: "flex", justifyContent: "space-around", textAlign: "center" }}>
+            <div>
+              <div style={{ fontSize: 11, color: C.sub }}>Durchgänge</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{curStat.runs}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: C.sub }}>Trefferquote</div>
+              <div
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: statAccuracyOf(curStat) >= 80 ? C.green : C.ink,
+                }}
+              >
+                {statAccuracyOf(curStat)} %
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: C.sub }}>Beste Serie</div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: C.gold }}>
+                {curStat.bestStreak}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p style={{ margin: "8px 0 0", fontSize: 13, color: C.sub, lineHeight: 1.5 }}>
+            Noch keine Werte. Nach dem ersten Durchgang steht hier deine Bilanz — sie bleibt
+            auf diesem Gerät gespeichert.
+          </p>
+        )}
+      </div>
 
       <button
         onClick={onStart}
@@ -1493,7 +1625,7 @@ function ReadingScreen({
 // =====================================================
 function ResultScreen({
   C, fontStack, finalMs, correct, wrong, answered, accuracy, bestStreak,
-  onRestart, onAgain,
+  curStat, statLabel, onRestart, onAgain,
 }) {
   const row = (label, val, color) => (
     <div
@@ -1542,6 +1674,46 @@ function ResultScreen({
             ? "Solide. Die Verwechsler wiederholen, dann wird's automatisch."
             : "Noch Verwechslungen — genau dafür ist das Modul da. Dranbleiben."}
         </p>
+      )}
+
+      {curStat && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: "12px 14px",
+            borderRadius: 12,
+            border: `1px solid ${C.line}`,
+            background: C.panel2,
+          }}
+        >
+          <div style={{ fontSize: 12, color: C.sub, fontWeight: 600, marginBottom: 8 }}>
+            GESAMT · {statLabel}
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-around", textAlign: "center" }}>
+            <div>
+              <div style={{ fontSize: 11, color: C.sub }}>Durchgänge</div>
+              <div style={{ fontSize: 18, fontWeight: 700 }}>{curStat.runs}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: C.sub }}>Ø Trefferquote</div>
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: statAccuracyOf(curStat) >= 80 ? C.green : C.ink,
+                }}
+              >
+                {statAccuracyOf(curStat)} %
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: C.sub }}>Beste Serie</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: C.gold }}>
+                {curStat.bestStreak}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
