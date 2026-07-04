@@ -247,55 +247,55 @@ const WORDS_QALAM = [
 
 // --- Surat al-Mulk (67), Ayat 1-5 ---
 const MULK_1_5 = tagAyat([
-  { ar: "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ", tr: "tabāraka lladhī bi-yadihi l-mulku wa-huwa ʿalā kulli shayʾin qadīr", de: "Gesegnet ist Der, in dessen Hand die Herrschaft liegt; und Er hat Macht über alle Dinge." },
-  { ar: "الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ", tr: "alladhī khalaqa l-mawta wa-l-ḥayāta li-yabluwakum ayyukum aḥsanu ʿamalā, wa-huwa l-ʿazīzu l-ghafūr", de: "Der Tod und Leben erschuf, um euch zu prüfen, wer von euch am besten handelt. Und Er ist der Allmächtige, der Allvergebende." },
-  { ar: "الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِن فُطُورٍ", tr: "alladhī khalaqa sabʿa samāwātin ṭibāqā …", de: "Der sieben Himmel in Schichten erschuf. Du siehst in der Schöpfung des Allerbarmers keinen Fehler. Wende den Blick zurück: Siehst du irgendeinen Riss?" },
-  { ar: "ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ", tr: "thumma rjiʿi l-baṣara karratayni …", de: "Dann wende den Blick ein zweites Mal zurück: Der Blick kehrt zu dir zurück, ermattet und erschöpft." },
-  { ar: "وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ", tr: "wa-laqad zayyannā s-samāʾa d-dunyā bi-maṣābīḥ …", de: "Wir haben den untersten Himmel mit Leuchten geschmückt und sie zu Wurfgeschossen gegen die Satane gemacht; und für sie haben Wir die Strafe des Feuers bereitet." },
+  { ar: "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ", tr: "tabāraka lladhī bi-yadihi l-mulku wa-huwa ʿalā kulli shayʾin qadīr"  },
+  { ar: "الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ", tr: "alladhī khalaqa l-mawta wa-l-ḥayāta li-yabluwakum ayyukum aḥsanu ʿamalā, wa-huwa l-ʿazīzu l-ghafūr"  },
+  { ar: "الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِن فُطُورٍ", tr: "alladhī khalaqa sabʿa samāwātin ṭibāqā …"  },
+  { ar: "ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ", tr: "thumma rjiʿi l-baṣara karratayni …"  },
+  { ar: "وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ", tr: "wa-laqad zayyannā s-samāʾa d-dunyā bi-maṣābīḥ …"  },
 ], 67, 1);
 
 // --- Surat al-Mulk (67), Ayat 6-11 ---
 const MULK_6_11 = tagAyat([
-  { ar: "وَلِلَّذِينَ كَفَرُوا بِرَبِّهِمْ عَذَابُ جَهَنَّمَ ۖ وَبِئْسَ الْمَصِيرُ", tr: "wa-li-lladhīna kafarū bi-rabbihim ʿadhābu jahannam …", de: "Und für die, die ihren Herrn verleugnen, ist die Strafe der Hölle — und ein schlimmes Ende ist das." },
-  { ar: "إِذَا أُلْقُوا فِيهَا سَمِعُوا لَهَا شَهِيقًا وَهِيَ تَفُورُ", tr: "idhā ulqū fīhā samiʿū lahā shahīqan wa-hiya tafūr", de: "Wenn sie hineingeworfen werden, hören sie ihr Aufheulen, während sie brodelt." },
-  { ar: "تَكَادُ تَمَيَّزُ مِنَ الْغَيْظِ ۖ كُلَّمَا أُلْقِيَ فِيهَا فَوْجٌ سَأَلَهُمْ خَزَنَتُهَا أَلَمْ يَأْتِكُمْ نَذِيرٌ", tr: "takādu tamayyazu mina l-ghayẓ …", de: "Fast birst sie vor Wut. Jedes Mal, wenn eine Schar hineingeworfen wird, fragen ihre Wächter sie: Ist zu euch kein Warner gekommen?" },
-  { ar: "قَالُوا بَلَىٰ قَدْ جَاءَنَا نَذِيرٌ فَكَذَّبْنَا وَقُلْنَا مَا نَزَّلَ اللَّهُ مِن شَيْءٍ إِنْ أَنتُمْ إِلَّا فِي ضَلَالٍ كَبِيرٍ", tr: "qālū balā qad jāʾanā nadhīr …", de: "Sie sagen: Doch, es kam ein Warner zu uns, aber wir leugneten und sagten: Gott hat nichts herabgesandt; ihr seid nur in großem Irrtum." },
-  { ar: "وَقَالُوا لَوْ كُنَّا نَسْمَعُ أَوْ نَعْقِلُ مَا كُنَّا فِي أَصْحَابِ السَّعِيرِ", tr: "wa-qālū law kunnā nasmaʿu aw naʿqilu …", de: "Und sie sagen: Hätten wir nur gehört oder verstanden, wären wir nicht unter den Bewohnern des Feuers." },
-  { ar: "فَاعْتَرَفُوا بِذَنبِهِمْ فَسُحْقًا لِّأَصْحَابِ السَّعِيرِ", tr: "fa-ʿtarafū bi-dhanbihim fa-suḥqan li-aṣḥābi s-saʿīr", de: "So gestehen sie ihre Sünde ein. Fort denn mit den Bewohnern des Feuers!" },
+  { ar: "وَلِلَّذِينَ كَفَرُوا بِرَبِّهِمْ عَذَابُ جَهَنَّمَ ۖ وَبِئْسَ الْمَصِيرُ", tr: "wa-li-lladhīna kafarū bi-rabbihim ʿadhābu jahannam …"  },
+  { ar: "إِذَا أُلْقُوا فِيهَا سَمِعُوا لَهَا شَهِيقًا وَهِيَ تَفُورُ", tr: "idhā ulqū fīhā samiʿū lahā shahīqan wa-hiya tafūr"  },
+  { ar: "تَكَادُ تَمَيَّزُ مِنَ الْغَيْظِ ۖ كُلَّمَا أُلْقِيَ فِيهَا فَوْجٌ سَأَلَهُمْ خَزَنَتُهَا أَلَمْ يَأْتِكُمْ نَذِيرٌ", tr: "takādu tamayyazu mina l-ghayẓ …"  },
+  { ar: "قَالُوا بَلَىٰ قَدْ جَاءَنَا نَذِيرٌ فَكَذَّبْنَا وَقُلْنَا مَا نَزَّلَ اللَّهُ مِن شَيْءٍ إِنْ أَنتُمْ إِلَّا فِي ضَلَالٍ كَبِيرٍ", tr: "qālū balā qad jāʾanā nadhīr …"  },
+  { ar: "وَقَالُوا لَوْ كُنَّا نَسْمَعُ أَوْ نَعْقِلُ مَا كُنَّا فِي أَصْحَابِ السَّعِيرِ", tr: "wa-qālū law kunnā nasmaʿu aw naʿqilu …"  },
+  { ar: "فَاعْتَرَفُوا بِذَنبِهِمْ فَسُحْقًا لِّأَصْحَابِ السَّعِيرِ", tr: "fa-ʿtarafū bi-dhanbihim fa-suḥqan li-aṣḥābi s-saʿīr"  },
 ], 67, 6);
 
 // --- Surat al-Qalam (68), Ayat 1-16 ---
 const QALAM_1_16 = tagAyat([
-  { ar: "نٓ ۚ وَالْقَلَمِ وَمَا يَسْطُرُونَ", tr: "nūn, wa-l-qalami wa-mā yasṭurūn", de: "Nūn. Beim Stift und bei dem, was sie niederschreiben." },
-  { ar: "مَا أَنتَ بِنِعْمَةِ رَبِّكَ بِمَجْنُونٍ", tr: "mā anta bi-niʿmati rabbika bi-majnūn", de: "Du bist, dank der Gnade deines Herrn, kein Besessener." },
-  { ar: "وَإِنَّ لَكَ لَأَجْرًا غَيْرَ مَمْنُونٍ", tr: "wa-inna laka la-ajran ghayra mamnūn", de: "Und dir wird gewiss ein nie endender Lohn zuteil." },
-  { ar: "وَإِنَّكَ لَعَلَىٰ خُلُقٍ عَظِيمٍ", tr: "wa-innaka la-ʿalā khuluqin ʿaẓīm", de: "Und du bist wahrlich von großartigem Charakter." },
-  { ar: "فَسَتُبْصِرُ وَيُبْصِرُونَ", tr: "fa-satubṣiru wa-yubṣirūn", de: "Du wirst sehen, und auch sie werden sehen," },
-  { ar: "بِأَيِّكُمُ الْمَفْتُونُ", tr: "bi-ayyikumu l-maftūn", de: "wer von euch der Verwirrte ist." },
-  { ar: "إِنَّ رَبَّكَ هُوَ أَعْلَمُ بِمَن ضَلَّ عَن سَبِيلِهِ وَهُوَ أَعْلَمُ بِالْمُهْتَدِينَ", tr: "inna rabbaka huwa aʿlamu bi-man ḍalla ʿan sabīlih …", de: "Dein Herr weiß am besten, wer von Seinem Weg abgeirrt ist, und Er kennt die Rechtgeleiteten am besten." },
-  { ar: "فَلَا تُطِعِ الْمُكَذِّبِينَ", tr: "fa-lā tuṭiʿi l-mukadhdhibīn", de: "So gehorche nicht den Leugnern." },
-  { ar: "وَدُّوا لَوْ تُدْهِنُ فَيُدْهِنُونَ", tr: "waddū law tudhinu fa-yudhinūn", de: "Sie möchten, dass du nachgibst, damit auch sie nachgeben." },
-  { ar: "وَلَا تُطِعْ كُلَّ حَلَّافٍ مَّهِينٍ", tr: "wa-lā tuṭiʿ kulla ḥallāfin mahīn", de: "Und gehorche keinem verächtlichen Schwörer," },
-  { ar: "هَمَّازٍ مَّشَّاءٍ بِنَمِيمٍ", tr: "hammāzin mashshāʾin bi-namīm", de: "Verleumder, der mit übler Nachrede umhergeht," },
-  { ar: "مَّنَّاعٍ لِّلْخَيْرِ مُعْتَدٍ أَثِيمٍ", tr: "mannāʿin li-l-khayri muʿtadin athīm", de: "der das Gute verwehrt, Übertreter und Sünder ist," },
-  { ar: "عُتُلٍّ بَعْدَ ذَٰلِكَ زَنِيمٍ", tr: "ʿutullin baʿda dhālika zanīm", de: "grob und dazu von zweifelhafter Herkunft," },
-  { ar: "أَن كَانَ ذَا مَالٍ وَبَنِينَ", tr: "an kāna dhā mālin wa-banīn", de: "nur weil er Vermögen und Söhne besitzt." },
-  { ar: "إِذَا تُتْلَىٰ عَلَيْهِ آيَاتُنَا قَالَ أَسَاطِيرُ الْأَوَّلِينَ", tr: "idhā tutlā ʿalayhi āyātunā qāla asāṭīru l-awwalīn", de: "Wenn ihm Unsere Zeichen verlesen werden, sagt er: Fabeln der Früheren!" },
-  { ar: "سَنَسِمُهُ عَلَى الْخُرْطُومِ", tr: "sanasimuhu ʿalā l-khurṭūm", de: "Wir werden ihn auf der Nase brandmarken." },
+  { ar: "نٓ ۚ وَالْقَلَمِ وَمَا يَسْطُرُونَ", tr: "nūn, wa-l-qalami wa-mā yasṭurūn"  },
+  { ar: "مَا أَنتَ بِنِعْمَةِ رَبِّكَ بِمَجْنُونٍ", tr: "mā anta bi-niʿmati rabbika bi-majnūn"  },
+  { ar: "وَإِنَّ لَكَ لَأَجْرًا غَيْرَ مَمْنُونٍ", tr: "wa-inna laka la-ajran ghayra mamnūn"  },
+  { ar: "وَإِنَّكَ لَعَلَىٰ خُلُقٍ عَظِيمٍ", tr: "wa-innaka la-ʿalā khuluqin ʿaẓīm"  },
+  { ar: "فَسَتُبْصِرُ وَيُبْصِرُونَ", tr: "fa-satubṣiru wa-yubṣirūn"  },
+  { ar: "بِأَيِّكُمُ الْمَفْتُونُ", tr: "bi-ayyikumu l-maftūn"  },
+  { ar: "إِنَّ رَبَّكَ هُوَ أَعْلَمُ بِمَن ضَلَّ عَن سَبِيلِهِ وَهُوَ أَعْلَمُ بِالْمُهْتَدِينَ", tr: "inna rabbaka huwa aʿlamu bi-man ḍalla ʿan sabīlih …"  },
+  { ar: "فَلَا تُطِعِ الْمُكَذِّبِينَ", tr: "fa-lā tuṭiʿi l-mukadhdhibīn"  },
+  { ar: "وَدُّوا لَوْ تُدْهِنُ فَيُدْهِنُونَ", tr: "waddū law tudhinu fa-yudhinūn"  },
+  { ar: "وَلَا تُطِعْ كُلَّ حَلَّافٍ مَّهِينٍ", tr: "wa-lā tuṭiʿ kulla ḥallāfin mahīn"  },
+  { ar: "هَمَّازٍ مَّشَّاءٍ بِنَمِيمٍ", tr: "hammāzin mashshāʾin bi-namīm"  },
+  { ar: "مَّنَّاعٍ لِّلْخَيْرِ مُعْتَدٍ أَثِيمٍ", tr: "mannāʿin li-l-khayri muʿtadin athīm"  },
+  { ar: "عُتُلٍّ بَعْدَ ذَٰلِكَ زَنِيمٍ", tr: "ʿutullin baʿda dhālika zanīm"  },
+  { ar: "أَن كَانَ ذَا مَالٍ وَبَنِينَ", tr: "an kāna dhā mālin wa-banīn"  },
+  { ar: "إِذَا تُتْلَىٰ عَلَيْهِ آيَاتُنَا قَالَ أَسَاطِيرُ الْأَوَّلِينَ", tr: "idhā tutlā ʿalayhi āyātunā qāla asāṭīru l-awwalīn"  },
+  { ar: "سَنَسِمُهُ عَلَى الْخُرْطُومِ", tr: "sanasimuhu ʿalā l-khurṭūm"  },
 ], 68, 1);
 
 // --- Surat al-Haqqa (69), Ayat 1-10 ---
 const HAQQA_1_10 = tagAyat([
-  { ar: "الْحَاقَّةُ", tr: "al-ḥāqqa", de: "Die Unausweichliche." },
-  { ar: "مَا الْحَاقَّةُ", tr: "mā l-ḥāqqa", de: "Was ist die Unausweichliche?" },
-  { ar: "وَمَا أَدْرَاكَ مَا الْحَاقَّةُ", tr: "wa-mā adrāka mā l-ḥāqqa", de: "Und was lässt dich wissen, was die Unausweichliche ist?" },
-  { ar: "كَذَّبَتْ ثَمُودُ وَعَادٌ بِالْقَارِعَةِ", tr: "kadhdhabat thamūdu wa-ʿādun bi-l-qāriʿa", de: "Thamud und ʿAd erklärten das Verhängnis für Lüge." },
-  { ar: "فَأَمَّا ثَمُودُ فَأُهْلِكُوا بِالطَّاغِيَةِ", tr: "fa-ammā thamūdu fa-uhlikū bi-ṭ-ṭāghiya", de: "Was Thamud angeht, so wurden sie durch den gewaltigen Schall vernichtet." },
-  { ar: "وَأَمَّا عَادٌ فَأُهْلِكُوا بِرِيحٍ صَرْصَرٍ عَاتِيَةٍ", tr: "wa-ammā ʿādun fa-uhlikū bi-rīḥin ṣarṣarin ʿātiya", de: "Und was ʿAd angeht, so wurden sie durch einen eiskalten, heftigen Sturm vernichtet," },
-  { ar: "سَخَّرَهَا عَلَيْهِمْ سَبْعَ لَيَالٍ وَثَمَانِيَةَ أَيَّامٍ حُسُومًا فَتَرَى الْقَوْمَ فِيهَا صَرْعَىٰ كَأَنَّهُمْ أَعْجَازُ نَخْلٍ خَاوِيَةٍ", tr: "sakhkharahā ʿalayhim sabʿa layālin wa-thamāniyata ayyāmin ḥusūmā …", de: "den Er sieben Nächte und acht Tage lang ununterbrochen über sie schickte, sodass du das Volk darin niedergestreckt sahst wie hohle Palmstümpfe." },
-  { ar: "فَهَلْ تَرَىٰ لَهُم مِّن بَاقِيَةٍ", tr: "fa-hal tarā lahum min bāqiya", de: "Siehst du von ihnen noch irgendetwas übrig?" },
-  { ar: "وَجَاءَ فِرْعَوْنُ وَمَن قَبْلَهُ وَالْمُؤْتَفِكَاتُ بِالْخَاطِئَةِ", tr: "wa-jāʾa firʿawnu wa-man qablahu wa-l-muʾtafikātu bi-l-khāṭiʾa", de: "Und Pharao kam, und die vor ihm, und die umgestürzten Städte, mit dem Vergehen." },
-  { ar: "فَعَصَوْا رَسُولَ رَبِّهِمْ فَأَخَذَهُمْ أَخْذَةً رَّابِيَةً", tr: "fa-ʿaṣaw rasūla rabbihim fa-akhadhahum akhdhatan rābiya", de: "Sie widersetzten sich dem Gesandten ihres Herrn, da ergriff Er sie mit übermäßigem Griff." },
+  { ar: "الْحَاقَّةُ", tr: "al-ḥāqqa"  },
+  { ar: "مَا الْحَاقَّةُ", tr: "mā l-ḥāqqa"  },
+  { ar: "وَمَا أَدْرَاكَ مَا الْحَاقَّةُ", tr: "wa-mā adrāka mā l-ḥāqqa"  },
+  { ar: "كَذَّبَتْ ثَمُودُ وَعَادٌ بِالْقَارِعَةِ", tr: "kadhdhabat thamūdu wa-ʿādun bi-l-qāriʿa"  },
+  { ar: "فَأَمَّا ثَمُودُ فَأُهْلِكُوا بِالطَّاغِيَةِ", tr: "fa-ammā thamūdu fa-uhlikū bi-ṭ-ṭāghiya"  },
+  { ar: "وَأَمَّا عَادٌ فَأُهْلِكُوا بِرِيحٍ صَرْصَرٍ عَاتِيَةٍ", tr: "wa-ammā ʿādun fa-uhlikū bi-rīḥin ṣarṣarin ʿātiya"  },
+  { ar: "سَخَّرَهَا عَلَيْهِمْ سَبْعَ لَيَالٍ وَثَمَانِيَةَ أَيَّامٍ حُسُومًا فَتَرَى الْقَوْمَ فِيهَا صَرْعَىٰ كَأَنَّهُمْ أَعْجَازُ نَخْلٍ خَاوِيَةٍ", tr: "sakhkharahā ʿalayhim sabʿa layālin wa-thamāniyata ayyāmin ḥusūmā …"  },
+  { ar: "فَهَلْ تَرَىٰ لَهُم مِّن بَاقِيَةٍ", tr: "fa-hal tarā lahum min bāqiya"  },
+  { ar: "وَجَاءَ فِرْعَوْنُ وَمَن قَبْلَهُ وَالْمُؤْتَفِكَاتُ بِالْخَاطِئَةِ", tr: "wa-jāʾa firʿawnu wa-man qablahu wa-l-muʾtafikātu bi-l-khāṭiʾa"  },
+  { ar: "فَعَصَوْا رَسُولَ رَبِّهِمْ فَأَخَذَهُمْ أَخْذَةً رَّابِيَةً", tr: "fa-ʿaṣaw rasūla rabbihim fa-akhadhahum akhdhatan rābiya"  },
 ], 69, 1);
 
 // --- Surat al-Maʿārij (70): AUSZUG (Ayat 1-10) — noch zu vervollstaendigen ---
@@ -303,16 +303,16 @@ const HAQQA_1_10 = tagAyat([
 // gepruefte Grundlage ein und lasse den Rest offen, statt 44 Verse aus
 // dem Gedaechtnis zu erfinden. Rest aus tanzil.net / api.quran.com ergaenzen.
 const MAARIJ_EXCERPT = tagAyat([
-  { ar: "سَأَلَ سَائِلٌ بِعَذَابٍ وَاقِعٍ", tr: "saʾala sāʾilun bi-ʿadhābin wāqiʿ", de: "Ein Fragender fragte nach einer eintreffenden Strafe," },
-  { ar: "لِّلْكَافِرِينَ لَيْسَ لَهُ دَافِعٌ", tr: "li-l-kāfirīna laysa lahu dāfiʿ", de: "für die Ungläubigen — niemand kann sie abwehren —" },
-  { ar: "مِّنَ اللَّهِ ذِي الْمَعَارِجِ", tr: "mina llāhi dhī l-maʿārij", de: "von Gott, dem Herrn der Aufstiegswege." },
-  { ar: "تَعْرُجُ الْمَلَائِكَةُ وَالرُّوحُ إِلَيْهِ فِي يَوْمٍ كَانَ مِقْدَارُهُ خَمْسِينَ أَلْفَ سَنَةٍ", tr: "taʿruju l-malāʾikatu wa-r-rūḥu ilayhi …", de: "Die Engel und der Geist steigen zu Ihm auf an einem Tag, dessen Maß fünfzigtausend Jahre ist." },
-  { ar: "فَاصْبِرْ صَبْرًا جَمِيلًا", tr: "fa-ṣbir ṣabran jamīlā", de: "So harre in schöner Geduld aus." },
-  { ar: "إِنَّهُمْ يَرَوْنَهُ بَعِيدًا", tr: "innahum yarawnahu baʿīdā", de: "Sie sehen sie (die Strafe) als fern," },
-  { ar: "وَنَرَاهُ قَرِيبًا", tr: "wa-narāhu qarībā", de: "Wir aber sehen sie als nah." },
-  { ar: "يَوْمَ تَكُونُ السَّمَاءُ كَالْمُهْلِ", tr: "yawma takūnu s-samāʾu ka-l-muhl", de: "Am Tag, da der Himmel wie geschmolzenes Erz wird," },
-  { ar: "وَتَكُونُ الْجِبَالُ كَالْعِهْنِ", tr: "wa-takūnu l-jibālu ka-l-ʿihn", de: "und die Berge wie gefärbte Wolle werden," },
-  { ar: "وَلَا يَسْأَلُ حَمِيمٌ حَمِيمًا", tr: "wa-lā yasʾalu ḥamīmun ḥamīmā", de: "und kein Vertrauter einen Vertrauten fragt." },
+  { ar: "سَأَلَ سَائِلٌ بِعَذَابٍ وَاقِعٍ", tr: "saʾala sāʾilun bi-ʿadhābin wāqiʿ"  },
+  { ar: "لِّلْكَافِرِينَ لَيْسَ لَهُ دَافِعٌ", tr: "li-l-kāfirīna laysa lahu dāfiʿ"  },
+  { ar: "مِّنَ اللَّهِ ذِي الْمَعَارِجِ", tr: "mina llāhi dhī l-maʿārij"  },
+  { ar: "تَعْرُجُ الْمَلَائِكَةُ وَالرُّوحُ إِلَيْهِ فِي يَوْمٍ كَانَ مِقْدَارُهُ خَمْسِينَ أَلْفَ سَنَةٍ", tr: "taʿruju l-malāʾikatu wa-r-rūḥu ilayhi …"  },
+  { ar: "فَاصْبِرْ صَبْرًا جَمِيلًا", tr: "fa-ṣbir ṣabran jamīlā"  },
+  { ar: "إِنَّهُمْ يَرَوْنَهُ بَعِيدًا", tr: "innahum yarawnahu baʿīdā"  },
+  { ar: "وَنَرَاهُ قَرِيبًا", tr: "wa-narāhu qarībā"  },
+  { ar: "يَوْمَ تَكُونُ السَّمَاءُ كَالْمُهْلِ", tr: "yawma takūnu s-samāʾu ka-l-muhl"  },
+  { ar: "وَتَكُونُ الْجِبَالُ كَالْعِهْنِ", tr: "wa-takūnu l-jibālu ka-l-ʿihn"  },
+  { ar: "وَلَا يَسْأَلُ حَمِيمٌ حَمِيمًا", tr: "wa-lā yasʾalu ḥamīmun ḥamīmā"  },
 ], 70, 1);
 
 // 3 Suren am Stueck: aus den oben abgedeckten Ayat zusammengesetzt
@@ -532,6 +532,45 @@ function statAccuracyOf(rec) {
   return rec && rec.answered > 0 ? Math.round((rec.correct / rec.answered) * 100) : 0;
 }
 
+// ============================================================
+//  Deutsche Übersetzung: LIVE von quranenc.com (Abu Rida)
+//  Kein aus dem Gedaechtnis geschriebener Text mehr. Pro Vers wird der
+//  geprüfte Text abgerufen und lokal gecached, damit er beim naechsten
+//  Mal offline verfuegbar ist. Kein Fallback-Text: laedt es nicht, steht
+//  das ehrlich dran, statt moeglicherweise Falsches anzuzeigen.
+//  Quelle/Key: german_aburida  (https://quranenc.com/en/home/api/)
+// ============================================================
+const TRANS_KEY = "german_aburida";
+const TRANS_CREDIT = "Übersetzung: Abu Rida (quranenc.com)";
+const TRANS_LS_PREFIX = "arabtrainer:trans:v1:";
+
+function transCacheGet(surah, ayah) {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(`${TRANS_LS_PREFIX}${surah}:${ayah}`);
+  } catch {
+    return null;
+  }
+}
+function transCacheSet(surah, ayah, text) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(`${TRANS_LS_PREFIX}${surah}:${ayah}`, text);
+  } catch {
+    // Speicher evtl. voll/blockiert -> ignorieren
+  }
+}
+async function fetchAburida(surah, ayah) {
+  const url = `https://quranenc.com/api/v1/translation/aya/${TRANS_KEY}/${surah}/${ayah}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  // Antwort ist { result: { translation, ... } } (defensiv beide Formen)
+  const t = (data && data.result && data.result.translation) || (data && data.translation);
+  if (!t) throw new Error("Kein Übersetzungstext in der Antwort");
+  return String(t).replace(/\s+/g, " ").trim();
+}
+
 export default function App() {
   const [screen, setScreen] = useState("start"); // start | play | result
 
@@ -539,6 +578,14 @@ export default function App() {
   const [moduleId, setModuleId] = useState("letters");
   const [mode, setMode] = useState("form2letter"); // nur Auswahl-Module
   const [packId, setPackId] = useState(null); // nur Lese-Module
+
+  // Auto-Modus (nur Auswahl-Module): Frage wird gezeigt, nach X Sekunden
+  // deckt die App die richtige Antwort selbst auf und geht weiter. Passives
+  // Anschauen, KEINE Statistik. Gilt fuer beide Varianten (Form→Buchstabe
+  // und Laut→Form) sowie sinngemaess fuer die Kurzvokale.
+  const [autoMode, setAutoMode] = useState(false);
+  const [autoRevealSec, setAutoRevealSec] = useState(3); // 1..8
+  const [autoPauseSec, setAutoPauseSec] = useState(1); // 0.5..3
 
   const curMod = getModule(moduleId);
   const isReading = curMod.kind === "reading";
@@ -585,6 +632,16 @@ export default function App() {
   const [reciterId, setReciterId] = useState(RECITERS[0].id);
   const reciterFolder = (RECITERS.find((r) => r.id === reciterId) || RECITERS[0]).folder;
   const audioElRef = useRef(typeof window !== "undefined" ? new Audio() : null);
+
+  // Timer fuer den Auto-Modus (Aufdecken + Pause bis zur naechsten Frage)
+  const autoRevealTimerRef = useRef(null);
+  const autoPauseTimerRef = useRef(null);
+  function clearAutoTimers() {
+    if (autoRevealTimerRef.current) clearTimeout(autoRevealTimerRef.current);
+    if (autoPauseTimerRef.current) clearTimeout(autoPauseTimerRef.current);
+    autoRevealTimerRef.current = null;
+    autoPauseTimerRef.current = null;
+  }
 
   useEffect(() => {
     const synth = synthRef.current;
@@ -695,6 +752,33 @@ export default function App() {
     return () => clearInterval(id);
   }, [screen, startTs]);
 
+  // ---- Auto-Modus: nach X Sekunden richtige Antwort selbst aufdecken ----
+  // Bei Laut-Fragen startet die Zeit erst, nachdem der Ton kurz laufen konnte.
+  useEffect(() => {
+    if (screen !== "play" || isReading || !autoMode || !q || locked) return;
+    const lead = q.audio ? 1000 : 0;
+    autoRevealTimerRef.current = setTimeout(() => {
+      setLocked(true);
+      setChosen(null); // nur die richtige Antwort markieren, kein Falsch-Feedback
+    }, lead + autoRevealSec * 1000);
+    return () => {
+      if (autoRevealTimerRef.current) clearTimeout(autoRevealTimerRef.current);
+    };
+  }, [screen, isReading, autoMode, q, locked, autoRevealSec]);
+
+  // ---- Auto-Modus: nach dem Aufdecken kurze Pause, dann naechste Frage ----
+  useEffect(() => {
+    if (screen !== "play" || isReading || !autoMode || !q || !locked) return;
+    autoPauseTimerRef.current = setTimeout(() => {
+      nextQuestion();
+    }, autoPauseSec * 1000);
+    return () => {
+      if (autoPauseTimerRef.current) clearTimeout(autoPauseTimerRef.current);
+    };
+    // nextQuestion bewusst nicht in den Deps (wird je Render neu erzeugt)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, isReading, autoMode, q, locked, autoPauseSec]);
+
   function selectModule(id) {
     const m = getModule(id);
     setModuleId(id);
@@ -713,6 +797,7 @@ export default function App() {
   function startGame() {
     resetStats();
     stopAudio();
+    clearAutoTimers();
     const ts = Date.now();
     setStartTs(ts);
     setElapsed(0);
@@ -744,6 +829,13 @@ export default function App() {
 
   function choose(opt, idx) {
     if (locked) return;
+    // Auto-Modus: darf man antippen, aber es wird nichts gezaehlt.
+    if (autoMode && !isReading) {
+      if (autoRevealTimerRef.current) clearTimeout(autoRevealTimerRef.current);
+      setLocked(true);
+      setChosen(idx);
+      return; // Pause-Effekt schaltet zur naechsten Frage weiter
+    }
     setLocked(true);
     setChosen(idx);
     setAnswered((n) => n + 1);
@@ -790,9 +882,15 @@ export default function App() {
   }
 
   function finish() {
-    setFinalMs(startTs ? Date.now() - startTs : 0);
+    clearAutoTimers();
     if (synthRef.current) synthRef.current.cancel();
     stopAudio();
+    // Auto-Modus: nichts gezaehlt -> kein Ergebnis-Screen, zurueck zum Start.
+    if (autoMode && !isReading) {
+      setScreen("start");
+      return;
+    }
+    setFinalMs(startTs ? Date.now() - startTs : 0);
     // Statistik nur zusammenfuehren, wenn wirklich etwas beantwortet wurde
     if (answered > 0) {
       setStatsMap((prev) => {
@@ -917,6 +1015,12 @@ export default function App() {
             curStat={curStat}
             statLabel={statLabel}
             onResetStats={resetCurrentStats}
+            autoMode={autoMode}
+            setAutoMode={setAutoMode}
+            autoRevealSec={autoRevealSec}
+            setAutoRevealSec={setAutoRevealSec}
+            autoPauseSec={autoPauseSec}
+            setAutoPauseSec={setAutoPauseSec}
           />
         )}
 
@@ -933,6 +1037,9 @@ export default function App() {
             correct={correct}
             wrong={wrong}
             streak={streak}
+            autoMode={autoMode}
+            autoRevealSec={autoRevealSec}
+            setAutoRevealSec={setAutoRevealSec}
           />
         )}
 
@@ -979,12 +1086,61 @@ export default function App() {
 // =====================================================
 //  Startbildschirm
 // =====================================================
+// Kleiner +/- Zahlenwaehler, im Stil der App.
+function Stepper({ C, label, value, unit, min, max, step, onChange, compact }) {
+  const btn = {
+    width: compact ? 34 : 40,
+    height: compact ? 34 : 40,
+    borderRadius: 10,
+    border: `1px solid ${C.line}`,
+    background: C.panel2,
+    color: C.ink,
+    fontSize: 20,
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    lineHeight: 1,
+  };
+  const dec = () => onChange(Math.max(min, Math.round((value - step) * 10) / 10));
+  const inc = () => onChange(Math.min(max, Math.round((value + step) * 10) / 10));
+  const fmt = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1).replace(".", ","));
+  return (
+    <div style={{ flex: 1, minWidth: 150 }}>
+      {label && (
+        <div style={{ fontSize: 12, color: C.sub, marginBottom: 6 }}>{label}</div>
+      )}
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={dec} disabled={value <= min} style={{ ...btn, opacity: value <= min ? 0.4 : 1 }} aria-label="weniger">
+          −
+        </button>
+        <div
+          style={{
+            minWidth: 56,
+            textAlign: "center",
+            fontSize: 17,
+            fontWeight: 700,
+            color: C.gold,
+          }}
+        >
+          {fmt(value)} {unit}
+        </div>
+        <button onClick={inc} disabled={value >= max} style={{ ...btn, opacity: value >= max ? 0.4 : 1 }} aria-label="mehr">
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function StartScreen({
   C, moduleId, onSelectModule, curMod, isReading,
   mode, setMode, packId, setPackId,
   needsVoice, voices, voiceURI, setVoiceURI, onPreviewVoice,
   needsReciter, reciterId, setReciterId, onTestReciter,
   onStart, curStat, statLabel, onResetStats,
+  autoMode, setAutoMode, autoRevealSec, setAutoRevealSec, autoPauseSec, setAutoPauseSec,
 }) {
   const card = {
     background: C.panel,
@@ -1040,6 +1196,82 @@ function StartScreen({
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Auswahl-Module: Auto-Modus */}
+      {!isReading && (
+        <div style={card}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: autoMode ? 14 : 0,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 13, color: C.sub, fontWeight: 600 }}>AUTO-MODUS</div>
+              <div style={{ fontSize: 12.5, color: C.sub, marginTop: 3 }}>
+                Nur zuschauen: die richtige Antwort erscheint nach kurzer Zeit von selbst.
+                Keine Statistik.
+              </div>
+            </div>
+            <button
+              onClick={() => setAutoMode((v) => !v)}
+              aria-label="Auto-Modus umschalten"
+              style={{
+                flexShrink: 0,
+                marginLeft: 12,
+                width: 54,
+                height: 30,
+                borderRadius: 999,
+                border: `1px solid ${autoMode ? C.green : C.line}`,
+                background: autoMode ? "rgba(63,174,107,0.25)" : C.panel2,
+                position: "relative",
+                cursor: "pointer",
+                transition: "all .15s",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: 3,
+                  left: autoMode ? 27 : 3,
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: autoMode ? C.green : C.sub,
+                  transition: "left .15s",
+                }}
+              />
+            </button>
+          </div>
+
+          {autoMode && (
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <Stepper
+                C={C}
+                label="Aufdecken nach"
+                value={autoRevealSec}
+                unit="s"
+                min={1}
+                max={8}
+                step={1}
+                onChange={setAutoRevealSec}
+              />
+              <Stepper
+                C={C}
+                label="Pause danach"
+                value={autoPauseSec}
+                unit="s"
+                min={0.5}
+                max={3}
+                step={0.5}
+                onChange={setAutoPauseSec}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -1166,7 +1398,8 @@ function StartScreen({
         </div>
       )}
 
-      {/* Gespeicherte Statistik fuer die aktuelle Auswahl */}
+      {/* Gespeicherte Statistik fuer die aktuelle Auswahl (im Auto-Modus sinnlos) */}
+      {!(autoMode && !isReading) && (
       <div style={{ ...card, marginBottom: 16 }}>
         <div
           style={{
@@ -1228,6 +1461,7 @@ function StartScreen({
           </p>
         )}
       </div>
+      )}
 
       <button
         onClick={onStart}
@@ -1261,6 +1495,7 @@ function StartScreen({
 function PlayScreen({
   C, fontStack, q, chosen, locked, onChoose, onFinish, onReplay,
   correct, wrong, streak,
+  autoMode, autoRevealSec, setAutoRevealSec,
 }) {
   const stat = (label, val, color) => (
     <div style={{ textAlign: "center" }}>
@@ -1271,23 +1506,53 @@ function PlayScreen({
 
   return (
     <div>
-      {/* Statuszeile — bewusst OHNE sichtbaren Countdown */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          alignItems: "center",
-          background: C.panel,
-          border: `1px solid ${C.line}`,
-          borderRadius: 14,
-          padding: "12px 8px",
-          marginBottom: 16,
-        }}
-      >
-        {stat("Richtig", correct, C.green)}
-        {stat("Falsch", wrong, C.red)}
-        {stat("Serie", streak, C.gold)}
-      </div>
+      {autoMode ? (
+        /* Auto-Modus: keine Statistik, dafuer Sekunden live einstellbar */
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 10,
+            background: C.panel,
+            border: `1px solid ${C.line}`,
+            borderRadius: 14,
+            padding: "10px 12px",
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ fontSize: 12.5, color: C.gold, fontWeight: 600 }}>Auto-Modus</div>
+          <Stepper
+            C={C}
+            label={null}
+            value={autoRevealSec}
+            unit="s"
+            min={1}
+            max={8}
+            step={1}
+            onChange={setAutoRevealSec}
+            compact
+          />
+        </div>
+      ) : (
+        /* Statuszeile — bewusst OHNE sichtbaren Countdown */
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+            background: C.panel,
+            border: `1px solid ${C.line}`,
+            borderRadius: 14,
+            padding: "12px 8px",
+            marginBottom: 16,
+          }}
+        >
+          {stat("Richtig", correct, C.green)}
+          {stat("Falsch", wrong, C.red)}
+          {stat("Serie", streak, C.gold)}
+        </div>
+      )}
 
       {/* Frage-Karte */}
       <div
@@ -1435,6 +1700,42 @@ function ReadingScreen({
     </div>
   );
 
+  // Vers = hat surah+ayah -> deutsche Übersetzung live von quranenc laden.
+  // Wort ohne surah/ayah -> weiterhin das kurze Glossar (item.de).
+  const isAyah = !!(item.surah && item.ayah);
+  const [deText, setDeText] = useState(null);
+  const [deState, setDeState] = useState("idle"); // idle | loading | ok | error
+
+  useEffect(() => {
+    if (!isAyah) {
+      setDeText(null);
+      setDeState("idle");
+      return;
+    }
+    let cancelled = false;
+    const cached = transCacheGet(item.surah, item.ayah);
+    if (cached) {
+      setDeText(cached);
+      setDeState("ok");
+      return;
+    }
+    setDeText(null);
+    setDeState("loading");
+    fetchAburida(item.surah, item.ayah)
+      .then((t) => {
+        if (cancelled) return;
+        transCacheSet(item.surah, item.ayah, t);
+        setDeText(t);
+        setDeState("ok");
+      })
+      .catch(() => {
+        if (!cancelled) setDeState("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAyah, item.surah, item.ayah]);
+
   const long = item.ar.length > 14;
 
   return (
@@ -1538,8 +1839,19 @@ function ReadingScreen({
           <div style={{ marginTop: 8 }}>
             <div style={{ color: C.gold, fontSize: 19, fontWeight: 700 }}>{item.tr}</div>
             <div style={{ color: C.sub, fontSize: 14.5, marginTop: 4, lineHeight: 1.5 }}>
-              {item.de}
+              {isAyah
+                ? deState === "ok"
+                  ? deText
+                  : deState === "loading"
+                  ? "Übersetzung wird geladen…"
+                  : "Übersetzung nicht verfügbar (offline?)."
+                : item.de}
             </div>
+            {isAyah && deState === "ok" && (
+              <div style={{ color: C.sub, fontSize: 10.5, marginTop: 6, opacity: 0.65 }}>
+                {TRANS_CREDIT}
+              </div>
+            )}
           </div>
         )}
       </div>
