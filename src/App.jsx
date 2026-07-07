@@ -774,6 +774,58 @@ function statAccuracyOf(rec) {
 }
 
 // ============================================================
+//  Lesen-Checkliste (Selbst-Abhaken, localStorage)
+//  Reihenfolge und Kategorien wie in der Notion-Liste des Nutzers.
+//  Die App hakt NICHT automatisch ab; man setzt den Haken selbst.
+// ============================================================
+const CHECK_LS_KEY = "arabtrainer:checklist:v1";
+
+const CHECK_CATS = {
+  alphabet: { label: "Alphabet", fg: "#8fb4e0", bg: "rgba(107,155,209,0.16)" },
+  harakat: { label: "Harakat", fg: "#d79a9a", bg: "rgba(201,138,138,0.16)" },
+  lesehilfen: { label: "Lesehilfen", fg: "#bb9ce0", bg: "rgba(168,138,201,0.16)" },
+  woerter: { label: "Wörter", fg: "#7fce9f", bg: "rgba(63,174,107,0.16)" },
+  lesen: { label: "Lesen", fg: "#e0c37f", bg: "rgba(217,178,95,0.16)" },
+};
+
+const CHECKLIST = [
+  { id: "c01", cat: "alphabet", text: "Ich erkenne alle 28 Buchstaben im Mushaf (Qurʾān-Schrift)" },
+  { id: "c02", cat: "alphabet", text: "Ich unterscheide ähnlich aussehende Buchstaben (ب/ت/ث/ن/ي) im Mushaf" },
+  { id: "c03", cat: "harakat", text: "Ich kenne die drei Kurzvokale: Fatha (a), Kasra (i), Damma (u)" },
+  { id: "c04", cat: "harakat", text: "Ich lese Wörter mit Sukūn im Qurʾān (z. B. قَدْ, لَمْ, قُلْ)" },
+  { id: "c05", cat: "harakat", text: "Ich lese Wörter mit Tanwīn (رَجُلٌ, كِتَابٍ, شُكْرًا)" },
+  { id: "c06", cat: "harakat", text: "Ich lese Wörter mit Shadda im Qurʾān (z. B. إِنَّ, رَبّ, حَقّ)" },
+  { id: "c07", cat: "harakat", text: "Ich lese Wörter mit Madd (قَالَ, يَقُولُ, قِيلَ)" },
+  { id: "c08", cat: "lesehilfen", text: "Ich unterscheide Lam Shamsiya und Lam Qamariya (السَّمَاء vs. الْقَمَر)" },
+  { id: "c09", cat: "lesehilfen", text: "Ich erkenne die gängigen Waqf-Zeichen" },
+  { id: "c10", cat: "woerter", text: "Ich lese 5 einzelne Wörter aus Sūrat al-Mulk" },
+  { id: "c11", cat: "woerter", text: "Ich lese 10 Wörter aus Sūrat al-Qalam" },
+  { id: "c12", cat: "lesen", text: "Ich lese Sūrat al-Mulk, Ayah 1–5" },
+  { id: "c13", cat: "lesen", text: "Ich lese Sūrat al-Mulk, Ayah 6–11" },
+  { id: "c14", cat: "lesen", text: "Ich lese Sūrat al-Qalam, Ayah 1–16" },
+  { id: "c15", cat: "lesen", text: "Ich lese Sūrat al-Ḥāqqa, Ayah 1–10" },
+  { id: "c16", cat: "lesen", text: "Ich lese eine kurze Sura komplett (z. B. al-Maʿārij)" },
+  { id: "c17", cat: "lesen", text: "Ich lese 3 Suren hintereinander (al-Mulk, al-Qalam, al-Ḥāqqa)" },
+];
+
+function loadChecklist() {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(window.localStorage.getItem(CHECK_LS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+function saveChecklist(obj) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(CHECK_LS_KEY, JSON.stringify(obj));
+  } catch {
+    // Speicher blockiert -> ignorieren
+  }
+}
+
+// ============================================================
 //  Deutsche Übersetzung: LIVE von quranenc.com (Abu Rida)
 //  Kein aus dem Gedaechtnis geschriebener Text mehr. Pro Vers wird der
 //  geprüfte Text abgerufen und lokal gecached, damit er beim naechsten
@@ -870,6 +922,23 @@ export default function App() {
     : (curMode && curMode.label) || curMod.title;
   // Aussprache-Check und Lesehilfen haben keine gespeicherte Statistik; Auto-Modus ebenfalls nicht.
   const showStats = !isPronun && !isGuide && !(autoMode && isChoice);
+
+  // Lesen-Checkliste (Selbst-Abhaken)
+  const [checklistDone, setChecklistDone] = useState(() => loadChecklist());
+  function toggleCheck(id) {
+    setChecklistDone((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      if (!next[id]) delete next[id];
+      saveChecklist(next);
+      return next;
+    });
+  }
+  function resetChecklist() {
+    setChecklistDone(() => {
+      saveChecklist({});
+      return {};
+    });
+  }
 
   // ---- Stimmen (Text-to-Speech, nur noch fuer Buchstaben/Harakat/Woerter) ----
   const [voices, setVoices] = useState([]);
@@ -1354,6 +1423,10 @@ export default function App() {
             onRestart={() => setScreen("start")}
             onAgain={startGame}
           />
+        )}
+
+        {screen === "start" && (
+          <ChecklistSection C={C} done={checklistDone} onToggle={toggleCheck} onReset={resetChecklist} />
         )}
       </div>
     </div>
@@ -2857,6 +2930,151 @@ function ResultScreen({
         >
           Einstellungen
         </button>
+      </div>
+    </div>
+  );
+}
+
+// =====================================================
+//  Lesen-Checkliste (Selbst-Abhaken, ganz unten auf dem Startbildschirm)
+// =====================================================
+function ChecklistSection({ C, done, onToggle, onReset }) {
+  const total = CHECKLIST.length;
+  const doneCount = CHECKLIST.filter((i) => done[i.id]).length;
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+  return (
+    <div style={{ marginTop: 34 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+          marginBottom: 10,
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Lesen-Checkliste</h2>
+        <span style={{ fontSize: 13, color: C.sub }}>
+          {doneCount} / {total} erledigt
+        </span>
+      </div>
+
+      {/* Fortschrittsbalken */}
+      <div
+        style={{
+          height: 8,
+          borderRadius: 999,
+          background: C.panel2,
+          border: `1px solid ${C.line}`,
+          overflow: "hidden",
+          marginBottom: 14,
+        }}
+      >
+        <div
+          style={{
+            width: `${pct}%`,
+            height: "100%",
+            background: `linear-gradient(90deg, ${C.green}, ${C.gold})`,
+            transition: "width .25s",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          background: C.panel,
+          border: `1px solid ${C.line}`,
+          borderRadius: 16,
+          overflow: "hidden",
+        }}
+      >
+        {CHECKLIST.map((item, idx) => {
+          const isDone = !!done[item.id];
+          const cat = CHECK_CATS[item.cat];
+          return (
+            <div
+              key={item.id}
+              onClick={() => onToggle(item.id)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "13px 14px",
+                borderTop: idx === 0 ? "none" : `1px solid ${C.line}`,
+                cursor: "pointer",
+                background: isDone ? "rgba(63,174,107,0.06)" : "transparent",
+              }}
+            >
+              {/* Checkbox */}
+              <div
+                style={{
+                  flexShrink: 0,
+                  width: 22,
+                  height: 22,
+                  borderRadius: 6,
+                  border: `1.5px solid ${isDone ? C.green : C.line}`,
+                  background: isDone ? C.green : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: 800,
+                }}
+              >
+                {isDone ? "✓" : ""}
+              </div>
+
+              <span
+                style={{
+                  flex: 1,
+                  fontSize: 13.5,
+                  lineHeight: 1.5,
+                  color: isDone ? C.sub : C.ink,
+                  textDecoration: isDone ? "line-through" : "none",
+                }}
+              >
+                {item.text}
+              </span>
+
+              <span
+                style={{
+                  flexShrink: 0,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: cat.fg,
+                  background: cat.bg,
+                  borderRadius: 6,
+                  padding: "3px 9px",
+                }}
+              >
+                {cat.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
+        <span style={{ fontSize: 12, color: C.sub }}>
+          Zum Abhaken antippen. Wird auf diesem Gerät gespeichert.
+        </span>
+        {doneCount > 0 && (
+          <button
+            onClick={onReset}
+            style={{
+              fontSize: 12,
+              color: C.sub,
+              background: "transparent",
+              border: `1px solid ${C.line}`,
+              borderRadius: 8,
+              padding: "5px 11px",
+              cursor: "pointer",
+            }}
+          >
+            zurücksetzen
+          </button>
+        )}
       </div>
     </div>
   );
