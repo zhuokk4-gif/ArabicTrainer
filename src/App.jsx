@@ -470,18 +470,6 @@ const CHOICE_MODULES = {
 };
 
 const READING_MODULES = {
-  words: {
-    id: "words",
-    kind: "reading",
-    title: "Wörter lesen",
-    subtitle: "Kurze Wörter flüssig lesen",
-    packs: [
-      { id: "sukun", label: "Sukun-Wörter", items: WORDS_SUKUN },
-      { id: "shadda", label: "Shadda-Wörter", items: WORDS_SHADDA },
-      { id: "mulkW", label: "al-Mulk — 5 Wörter", items: WORDS_MULK, note: QURAN_NOTE },
-      { id: "qalamW", label: "al-Qalam — 10 Wörter", items: WORDS_QALAM, note: QURAN_NOTE },
-    ],
-  },
   ayat: {
     id: "ayat",
     kind: "reading",
@@ -500,8 +488,169 @@ const READING_MODULES = {
 
 const MODULE_ORDER = ["letters", "harakat", "words", "ayat"];
 
+// ============================================================
+//  Wörter lesen (Aussprache-Check-Ablauf)
+//  Ablauf je Wort: arabisches Wort (mit Harakat) zeigen -> selbst laut
+//  lesen -> "Lösung zeigen" -> Umschrift + kurzer Hinweis -> "Nächstes
+//  Wort". Kein Bewerten, keine Statistik, per Klick weiter.
+//
+//  Der Hinweis (`hint`) ist je Kategorie unterschiedlich sinnvoll:
+//   - Regel-Kategorien (Sukun, spaeter Tanwin/Shadda/Madd): Ausspracheregel.
+//   - Vokabel-Kategorien (al-Mulk/al-Qalam): die Bedeutung, da es dort
+//     keine einheitliche Ausspracheregel gibt.
+//  Fehlt `hint` bei einem Wort, greift die `rule` der Kategorie.
+//  Neue Regel-Kategorie ergaenzen: Array wie PRONUN_SUKUN anlegen und als
+//  Pack-Objekt (mit `rule`) ins packs-Array haengen.
+// ============================================================
+const PRONUN_SUKUN = [
+  { ar: "قَدْ", tr: "qad", hint: "qa + d ohne Vokal — hart abschneiden, nicht „qada“." },
+  { ar: "لَمْ", tr: "lam", hint: "la + m ohne Vokal — Lippen auf „m“ schließen." },
+  { ar: "قُلْ", tr: "qul", hint: "qu + l ohne Vokal — hart auf „l“ enden." },
+  { ar: "مِنْ", tr: "min", hint: "mi + n ohne Vokal — nasal auf „n“ enden." },
+  { ar: "عَنْ", tr: "ʿan", hint: "ʿa (Kehllaut) + n ohne Vokal — kurz, nicht „ʿana“." },
+  { ar: "هَلْ", tr: "hal", hint: "ha + l ohne Vokal — auf „l“ abschneiden." },
+  { ar: "بَلْ", tr: "bal", hint: "ba + l ohne Vokal — auf „l“ abschneiden." },
+  { ar: "كَمْ", tr: "kam", hint: "ka + m ohne Vokal — Lippen auf „m“ schließen." },
+  { ar: "لَنْ", tr: "lan", hint: "la + n ohne Vokal — nasal auf „n“ enden." },
+  { ar: "مَنْ", tr: "man", hint: "ma + n ohne Vokal — nasal auf „n“ enden." },
+  { ar: "كَيْفَ", tr: "kayfa", hint: "Sukun auf ي (يْ) — kay, dann fa: kayfa." },
+  { ar: "أَيْنَ", tr: "ayna", hint: "Sukun auf ي — ay, dann na: ayna." },
+  { ar: "فَوْق", tr: "fawq", hint: "Sukun auf و (وْ) — faw, dann q: fawq." },
+  { ar: "تَحْت", tr: "taḥt", hint: "Sukun auf ح — taḥ, dann t: taḥt." },
+  { ar: "نَعَمْ", tr: "naʿam", hint: "Sukun auf م — naʿa, dann m abschneiden: naʿam." },
+  { ar: "شَمْس", tr: "šams", hint: "Sukun auf م (مْ) — šam, dann s: šams." },
+  { ar: "عَبْد", tr: "ʿabd", hint: "Sukun auf ب — ʿab, dann d: ʿabd." },
+  { ar: "خَيْر", tr: "khayr", hint: "Sukun auf ي — khay, dann r: khayr." },
+  { ar: "بَعْد", tr: "baʿd", hint: "Sukun auf ع — baʿ, dann d: baʿd." },
+  { ar: "قَبْل", tr: "qabl", hint: "Sukun auf ب — qab, dann l: qabl." },
+];
+
+// Tanwin (Nunation): doppeltes Vokalzeichen am Wortende, klingt wie ein
+// zusätzliches „n“. ٌ = -un, ٍ = -in, ً = -an. Bei ً steht meist ein stummes
+// Alif (ـًا), das NICHT als langes „a“ mitgesprochen wird.
+const PRONUN_TANWIN = [
+  { ar: "رَجُلٌ", tr: "raǧulun", hint: "Endung ٌ (Tanwin Damma) = „-un“: raǧul + un." },
+  { ar: "كِتَابٌ", tr: "kitābun", hint: "ٌ am Ende = „-un“: kitāb + un." },
+  { ar: "عَلِيمٌ", tr: "ʿalīmun", hint: "ٌ = „-un“: ʿalīm + un." },
+  { ar: "وَلَدٌ", tr: "waladun", hint: "ٌ = „-un“: walad + un." },
+  { ar: "بَيْتٌ", tr: "baytun", hint: "ٌ = „-un“: bayt + un." },
+  { ar: "رِزْقٌ", tr: "rizqun", hint: "ٌ = „-un“: rizq + un." },
+  { ar: "كِتَابٍ", tr: "kitābin", hint: "Endung ٍ (Tanwin Kasra) = „-in“: kitāb + in." },
+  { ar: "يَوْمٍ", tr: "yawmin", hint: "ٍ = „-in“: yawm + in." },
+  { ar: "قَوْمٍ", tr: "qawmin", hint: "ٍ = „-in“: qawm + in." },
+  { ar: "بَيْتٍ", tr: "baytin", hint: "ٍ = „-in“: bayt + in." },
+  { ar: "رَجُلٍ", tr: "raǧulin", hint: "ٍ = „-in“: raǧul + in." },
+  { ar: "شَيْءٍ", tr: "shayʾin", hint: "ٍ = „-in“: shayʾ + in." },
+  { ar: "كِتَابًا", tr: "kitāban", hint: "Endung ـًا (Tanwin Fatha) = „-an“: kitāb + an. Das Alif ist stumm." },
+  { ar: "كَثِيرًا", tr: "kaṯīran", hint: "ـًا = „-an“: kaṯīr + an. Alif nicht mitsprechen." },
+  { ar: "شُكْرًا", tr: "šukran", hint: "ـًا = „-an“: šukr + an. Alif nicht mitsprechen." },
+  { ar: "بَابًا", tr: "bāban", hint: "ـًا = „-an“: bāb + an. Alif stumm." },
+  { ar: "عِلْمًا", tr: "ʿilman", hint: "ـًا = „-an“: ʿilm + an. Alif stumm." },
+  { ar: "خَيْرًا", tr: "khayran", hint: "ـًا = „-an“: khayr + an. Alif stumm." },
+];
+
+// Vokabel-Listen ({ar,tr,de}) in Aussprache-Items ({ar,tr,hint}) umwandeln:
+// die Bedeutung wird zum Hinweis. So bleibt der Inhalt erhalten.
+function meaningItems(arr) {
+  return arr.map((w) => ({ ar: w.ar, tr: w.tr, hint: w.de }));
+}
+
+// Shadda (ّ) verdoppelt den Konsonanten (Gemination): kurz auf dem Laut
+// verweilen, ihn verstärkt/doppelt sprechen.
+const PRONUN_SHADDA = [
+  { ar: "رَبّ", tr: "rabb", hint: "Shadda auf ب → b verdoppelt: „rab-b“." },
+  { ar: "إِنَّ", tr: "inna", hint: "Shadda auf ن → n verdoppelt: „in-na“." },
+  { ar: "حَقّ", tr: "ḥaqq", hint: "Shadda auf ق → q verdoppelt: „ḥaq-q“." },
+  { ar: "كُلّ", tr: "kull", hint: "Shadda auf ل → l verdoppelt: „kul-l“." },
+  { ar: "أُمّ", tr: "umm", hint: "Shadda auf م → m verdoppelt: „um-m“." },
+  { ar: "جَنَّة", tr: "janna", hint: "Shadda auf ن → n verdoppelt: „jan-na“." },
+  { ar: "عَدُوّ", tr: "ʿaduww", hint: "Shadda auf و → w verdoppelt: „ʿaduw-w“." },
+  { ar: "رَبَّنَا", tr: "rabbanā", hint: "Shadda auf ب → b verdoppelt: „rab-ba-nā“." },
+  { ar: "مُحَمَّد", tr: "muḥammad", hint: "Shadda auf م → m verdoppelt: „muḥam-mad“." },
+  { ar: "الَّذِي", tr: "alladhī", hint: "Shadda auf ل → l verdoppelt: „al-ladhī“." },
+  { ar: "عَلَّمَ", tr: "ʿallama", hint: "Shadda auf ل → l verdoppelt: „ʿal-lama“." },
+  { ar: "حُبّ", tr: "ḥubb", hint: "Shadda auf ب → b verdoppelt: „ḥub-b“." },
+  { ar: "سِرّ", tr: "sirr", hint: "Shadda auf ر → r verdoppelt: „sir-r“." },
+  { ar: "مَرَّة", tr: "marra", hint: "Shadda auf ر → r verdoppelt: „mar-ra“." },
+  { ar: "ظَنَّ", tr: "ẓanna", hint: "Shadda auf ن → n verdoppelt: „ẓan-na“." },
+  { ar: "شِدَّة", tr: "shidda", hint: "Shadda auf د → d verdoppelt: „shid-da“." },
+];
+
+// Madd = Dehnung des Vokals (natürliches Madd, ~2 Zählzeiten). Drei
+// Dehnbuchstaben: Alif nach Fatha = langes ā, Waw nach Damma = langes ū,
+// Ya nach Kasra = langes ī.
+const PRONUN_MADD = [
+  { ar: "قَالَ", tr: "qāla", hint: "Alif nach Fatha (قَا) → langes „a“: qāla, nicht kurz „qala“." },
+  { ar: "نَار", tr: "nār", hint: "Alif nach Fatha → langes „a“: nār." },
+  { ar: "بَاب", tr: "bāb", hint: "Alif nach Fatha → langes „a“: bāb." },
+  { ar: "مَال", tr: "māl", hint: "Alif nach Fatha → langes „a“: māl." },
+  { ar: "نَاس", tr: "nās", hint: "Alif nach Fatha → langes „a“: nās." },
+  { ar: "عَالَم", tr: "ʿālam", hint: "Alif nach Fatha → langes „a“: ʿālam." },
+  { ar: "يَقُولُ", tr: "yaqūlu", hint: "Waw nach Damma (قُو) → langes „u“: yaqūlu." },
+  { ar: "نُور", tr: "nūr", hint: "Waw nach Damma → langes „u“: nūr, nicht kurz „nur“." },
+  { ar: "رُوح", tr: "rūḥ", hint: "Waw nach Damma → langes „u“: rūḥ." },
+  { ar: "يَكُونُ", tr: "yakūnu", hint: "Waw nach Damma → langes „u“: yakūnu." },
+  { ar: "صُور", tr: "ṣūr", hint: "Waw nach Damma → langes „u“: ṣūr." },
+  { ar: "دُون", tr: "dūn", hint: "Waw nach Damma → langes „u“: dūn." },
+  { ar: "قِيلَ", tr: "qīla", hint: "Ya nach Kasra (قِي) → langes „i“: qīla." },
+  { ar: "كَبِير", tr: "kabīr", hint: "Ya nach Kasra → langes „i“: kabīr." },
+  { ar: "رَحِيم", tr: "raḥīm", hint: "Ya nach Kasra → langes „i“: raḥīm." },
+  { ar: "دِين", tr: "dīn", hint: "Ya nach Kasra → langes „i“: dīn." },
+  { ar: "عِيد", tr: "ʿīd", hint: "Ya nach Kasra → langes „i“: ʿīd." },
+  { ar: "سَعِيد", tr: "saʿīd", hint: "Ya nach Kasra → langes „i“: saʿīd." },
+];
+
+const PRONUN_MODULES = {
+  words: {
+    id: "words",
+    kind: "pronunciation",
+    title: "Wörter lesen",
+    subtitle: "Wort lesen, dann Umschrift + Hinweis prüfen",
+    packs: [
+      {
+        id: "sukun",
+        label: "Sukun",
+        rule: "Sukun (ْ) heißt: der Buchstabe trägt keinen Vokal. Kurz und hart aussprechen, ohne Vokal danach.",
+        items: PRONUN_SUKUN,
+      },
+      {
+        id: "tanwin",
+        label: "Tanwin",
+        rule: "Tanwin ist ein doppeltes Vokalzeichen am Wortende und klingt wie ein zusätzliches „n“: ٌ = -un, ٍ = -in, ً = -an. Bei ً steht meist ein stummes Alif (ـًا).",
+        items: PRONUN_TANWIN,
+      },
+      // Shadda zeigt jetzt die Ausspracheregel (Gemination), analog Sukun/Tanwin.
+      {
+        id: "shadda",
+        label: "Shadda",
+        rule: "Shadda (ّ) verdoppelt den Buchstaben: kurz auf dem Laut verweilen und ihn verstärkt aussprechen.",
+        items: PRONUN_SHADDA,
+      },
+      {
+        id: "madd",
+        label: "Madd",
+        rule: "Madd = Vokal dehnen (etwa doppelt so lang). Alif nach Fatha = langes „ā“, Waw nach Damma = langes „ū“, Ya nach Kasra = langes „ī“.",
+        items: PRONUN_MADD,
+      },
+      // al-Mulk / al-Qalam zeigen die Bedeutung als Hinweis (Vokabeln, keine Regel).
+      {
+        id: "mulkW",
+        label: "al-Mulk — 5 Wörter",
+        rule: "Wörter aus Sūrat al-Mulk.",
+        items: meaningItems(WORDS_MULK),
+      },
+      {
+        id: "qalamW",
+        label: "al-Qalam — 10 Wörter",
+        rule: "Wörter aus Sūrat al-Qalam.",
+        items: meaningItems(WORDS_QALAM),
+      },
+    ],
+  },
+};
+
 function getModule(id) {
-  return CHOICE_MODULES[id] || READING_MODULES[id];
+  return CHOICE_MODULES[id] || READING_MODULES[id] || PRONUN_MODULES[id];
 }
 
 // ============================================================
@@ -589,7 +738,10 @@ export default function App() {
 
   const curMod = getModule(moduleId);
   const isReading = curMod.kind === "reading";
-  const curMode = !isReading ? curMod.modes.find((m) => m.id === mode) : null;
+  const isChoice = curMod.kind === "choice";
+  const isPronun = curMod.kind === "pronunciation";
+  // curMode nur bei Auswahl-Modulen (nur die haben `modes`).
+  const curMode = isChoice ? curMod.modes.find((m) => m.id === mode) : null;
   // "ayat" hat echte Rezitation -> eigener Rezitator-Picker statt TTS-Stimmenliste.
   const needsReciter = isReading && curMod.id === "ayat";
   const needsVoice = (curMode && curMode.audio) || (isReading && curMod.id === "words");
@@ -617,11 +769,14 @@ export default function App() {
 
   // Gespeicherte Statistik (localStorage), je Modus/Paket
   const [statsMap, setStatsMap] = useState(() => loadAllStats());
-  const statKey = isReading ? `${moduleId}:${packId}` : `${moduleId}:${mode}`;
+  const hasPacks = !!curMod.packs;
+  const statKey = hasPacks ? `${moduleId}:${packId}` : `${moduleId}:${mode}`;
   const curStat = statsMap[statKey] || null;
-  const statLabel = isReading
+  const statLabel = hasPacks
     ? (curMod.packs.find((p) => p.id === packId) || {}).label || curMod.title
     : (curMode && curMode.label) || curMod.title;
+  // Aussprache-Check hat keine Statistik; Auto-Modus ebenfalls nicht.
+  const showStats = !isPronun && !(autoMode && isChoice);
 
   // ---- Stimmen (Text-to-Speech, nur noch fuer Buchstaben/Harakat/Woerter) ----
   const [voices, setVoices] = useState([]);
@@ -808,6 +963,9 @@ export default function App() {
       setRIdx(0);
       setRevealed(false);
       setScreen("play");
+    } else if (isPronun) {
+      // Aussprache-Check verwaltet Index/Aufloesen im eigenen Screen.
+      setScreen("play");
     } else {
       setChosen(null);
       setLocked(false);
@@ -944,7 +1102,7 @@ export default function App() {
     "'Amiri', 'Amiri Quran', 'Scheherazade New', 'Noto Naskh Arabic', serif";
 
   const rItem = isReading ? rQueue[rIdx] : null;
-  const curPack = isReading
+  const curPack = hasPacks
     ? curMod.packs.find((p) => p.id === packId) || curMod.packs[0]
     : null;
 
@@ -1021,10 +1179,11 @@ export default function App() {
             setAutoRevealSec={setAutoRevealSec}
             autoPauseSec={autoPauseSec}
             setAutoPauseSec={setAutoPauseSec}
+            showStats={showStats}
           />
         )}
 
-        {screen === "play" && !isReading && q && (
+        {screen === "play" && isChoice && q && (
           <PlayScreen
             C={C}
             fontStack={fontStack}
@@ -1040,6 +1199,18 @@ export default function App() {
             autoMode={autoMode}
             autoRevealSec={autoRevealSec}
             setAutoRevealSec={setAutoRevealSec}
+          />
+        )}
+
+        {screen === "play" && isPronun && curPack && (
+          <PronunciationScreen
+            key={curPack.id}
+            C={C}
+            fontStack={fontStack}
+            items={curPack.items}
+            rule={curPack.rule}
+            packLabel={curPack.label}
+            onExit={() => setScreen("start")}
           />
         )}
 
@@ -1141,7 +1312,10 @@ function StartScreen({
   needsReciter, reciterId, setReciterId, onTestReciter,
   onStart, curStat, statLabel, onResetStats,
   autoMode, setAutoMode, autoRevealSec, setAutoRevealSec, autoPauseSec, setAutoPauseSec,
+  showStats,
 }) {
+  const isChoice = curMod.kind === "choice";
+  const hasPacks = !!curMod.packs;
   const card = {
     background: C.panel,
     border: `1px solid ${C.line}`,
@@ -1183,7 +1357,7 @@ function StartScreen({
       </div>
 
       {/* Auswahl-Module: Modus */}
-      {!isReading && (
+      {isChoice && (
         <div style={card}>
           <div style={{ fontSize: 13, color: C.sub, marginBottom: 10, fontWeight: 600 }}>
             MODUS WÄHLEN
@@ -1200,7 +1374,7 @@ function StartScreen({
       )}
 
       {/* Auswahl-Module: Auto-Modus */}
-      {!isReading && (
+      {isChoice && (
         <div style={card}>
           <div
             style={{
@@ -1276,16 +1450,18 @@ function StartScreen({
       )}
 
       {/* Lese-Module: Paket */}
-      {isReading && (
+      {hasPacks && (
         <div style={card}>
           <div style={{ fontSize: 13, color: C.sub, marginBottom: 10, fontWeight: 600 }}>
-            INHALT WÄHLEN
+            {curMod.kind === "pronunciation" ? "KATEGORIE WÄHLEN" : "INHALT WÄHLEN"}
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             {curMod.packs.map((p) => (
               <button key={p.id} style={pickBtn(packId === p.id)} onClick={() => setPackId(p.id)}>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{p.label}</div>
-                <div style={{ fontSize: 12.5, color: C.sub, marginTop: 3 }}>{p.items.length} Karten</div>
+                <div style={{ fontSize: 12.5, color: C.sub, marginTop: 3 }}>
+                  {p.items.length} {curMod.kind === "pronunciation" ? "Wörter" : "Karten"}
+                </div>
               </button>
             ))}
           </div>
@@ -1398,8 +1574,8 @@ function StartScreen({
         </div>
       )}
 
-      {/* Gespeicherte Statistik fuer die aktuelle Auswahl (im Auto-Modus sinnlos) */}
-      {!(autoMode && !isReading) && (
+      {/* Gespeicherte Statistik (nicht im Auto-Modus, nicht im Aussprache-Check) */}
+      {showStats && (
       <div style={{ ...card, marginBottom: 16 }}>
         <div
           style={{
@@ -1927,6 +2103,168 @@ function ReadingScreen({
         }}
       >
         Fertig
+      </button>
+    </div>
+  );
+}
+
+// =====================================================
+//  Aussprache-Check
+//  Wort zeigen -> selbst laut lesen -> Lösung (Umschrift + Regel-Hinweis)
+//  -> nächstes Wort. Enter/Leertaste als Tastatur-Shortcut. Keine Statistik.
+// =====================================================
+function PronunciationScreen({ C, fontStack, items, rule, packLabel, onExit }) {
+  const [idx, setIdx] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+
+  const item = items[idx];
+  const isLast = idx >= items.length - 1;
+  const long = item.ar.length > 14;
+
+  function reveal() {
+    setRevealed(true);
+  }
+  function next() {
+    if (isLast) {
+      onExit();
+      return;
+    }
+    setIdx((i) => i + 1);
+    setRevealed(false);
+  }
+  // Enter als Shortcut: erst auflösen, dann weiter (nützlich mit iPad-Tastatur).
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      if (!revealed) reveal();
+      else next();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [revealed, idx, isLast]);
+
+  const primaryBtn = {
+    width: "100%",
+    padding: "15px",
+    borderRadius: 14,
+    border: "none",
+    background: `linear-gradient(180deg, ${C.green}, ${C.greenD})`,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: 700,
+    cursor: "pointer",
+    marginBottom: 12,
+  };
+
+  return (
+    <div>
+      {/* Kopfzeile: Kategorie + Fortschritt (keine Statistik) */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          background: C.panel,
+          border: `1px solid ${C.line}`,
+          borderRadius: 14,
+          padding: "12px 14px",
+          marginBottom: 16,
+        }}
+      >
+        <span style={{ fontSize: 13, color: C.sub, fontWeight: 600 }}>{packLabel}</span>
+        <span
+          style={{
+            fontSize: 12.5,
+            color: C.gold,
+            border: `1px solid ${C.line}`,
+            borderRadius: 999,
+            padding: "4px 12px",
+          }}
+        >
+          {idx + 1} / {items.length}
+        </span>
+      </div>
+
+      {/* Wort-Karte */}
+      <div
+        style={{
+          background: C.panel,
+          border: `1px solid ${C.line}`,
+          borderRadius: 18,
+          padding: "24px 18px 26px",
+          textAlign: "center",
+          marginBottom: 16,
+        }}
+      >
+        <div
+          key={item.ar}
+          style={{
+            fontFamily: fontStack,
+            fontSize: long ? 40 : 72,
+            lineHeight: 1.3,
+            direction: "rtl",
+            color: C.ink,
+            animation: "pop .18s ease",
+            minHeight: 110,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {item.ar}
+        </div>
+
+        {!revealed ? (
+          <div style={{ color: C.sub, fontSize: 14, marginTop: 6 }}>
+            Lies das Wort laut. Dann Lösung zeigen.
+          </div>
+        ) : (
+          <div style={{ marginTop: 10 }}>
+            <div style={{ color: C.gold, fontSize: 22, fontWeight: 700 }}>{item.tr}</div>
+            <div
+              style={{
+                color: C.sub,
+                fontSize: 14.5,
+                marginTop: 8,
+                lineHeight: 1.55,
+                maxWidth: 440,
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              {item.hint || rule}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {!revealed ? (
+        <button onClick={reveal} style={primaryBtn}>
+          Lösung zeigen
+        </button>
+      ) : (
+        <button onClick={next} style={primaryBtn}>
+          {isLast ? "Fertig ✓" : "Nächstes Wort"}
+        </button>
+      )}
+
+      <button
+        onClick={onExit}
+        style={{
+          width: "100%",
+          padding: "15px",
+          borderRadius: 14,
+          border: `1px solid ${C.gold}`,
+          background: "transparent",
+          color: C.gold,
+          fontSize: 16,
+          fontWeight: 700,
+          cursor: "pointer",
+        }}
+      >
+        Beenden
       </button>
     </div>
   );
