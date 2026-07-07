@@ -518,7 +518,7 @@ const PRONUN_SUKUN = [
   { ar: "فَوْق", tr: "fawq", hint: "Sukun auf و (وْ) — faw, dann q: fawq." },
   { ar: "تَحْت", tr: "taḥt", hint: "Sukun auf ح — taḥ, dann t: taḥt." },
   { ar: "نَعَمْ", tr: "naʿam", hint: "Sukun auf م — naʿa, dann m abschneiden: naʿam." },
-  { ar: "شَمْس", tr: "šams", hint: "Sukun auf م (مْ) — šam, dann s: šams." },
+  { ar: "شَمْس", tr: "shams", hint: "Sukun auf م (مْ) — sham, dann s: shams." },
   { ar: "عَبْد", tr: "ʿabd", hint: "Sukun auf ب — ʿab, dann d: ʿabd." },
   { ar: "خَيْر", tr: "khayr", hint: "Sukun auf ي — khay, dann r: khayr." },
   { ar: "بَعْد", tr: "baʿd", hint: "Sukun auf ع — baʿ, dann d: baʿd." },
@@ -529,7 +529,7 @@ const PRONUN_SUKUN = [
 // zusätzliches „n“. ٌ = -un, ٍ = -in, ً = -an. Bei ً steht meist ein stummes
 // Alif (ـًا), das NICHT als langes „a“ mitgesprochen wird.
 const PRONUN_TANWIN = [
-  { ar: "رَجُلٌ", tr: "raǧulun", hint: "Endung ٌ (Tanwin Damma) = „-un“: raǧul + un." },
+  { ar: "رَجُلٌ", tr: "rajulun", hint: "Endung ٌ (Tanwin Damma) = „-un“: rajul + un." },
   { ar: "كِتَابٌ", tr: "kitābun", hint: "ٌ am Ende = „-un“: kitāb + un." },
   { ar: "عَلِيمٌ", tr: "ʿalīmun", hint: "ٌ = „-un“: ʿalīm + un." },
   { ar: "وَلَدٌ", tr: "waladun", hint: "ٌ = „-un“: walad + un." },
@@ -539,11 +539,11 @@ const PRONUN_TANWIN = [
   { ar: "يَوْمٍ", tr: "yawmin", hint: "ٍ = „-in“: yawm + in." },
   { ar: "قَوْمٍ", tr: "qawmin", hint: "ٍ = „-in“: qawm + in." },
   { ar: "بَيْتٍ", tr: "baytin", hint: "ٍ = „-in“: bayt + in." },
-  { ar: "رَجُلٍ", tr: "raǧulin", hint: "ٍ = „-in“: raǧul + in." },
+  { ar: "رَجُلٍ", tr: "rajulin", hint: "ٍ = „-in“: rajul + in." },
   { ar: "شَيْءٍ", tr: "shayʾin", hint: "ٍ = „-in“: shayʾ + in." },
   { ar: "كِتَابًا", tr: "kitāban", hint: "Endung ـًا (Tanwin Fatha) = „-an“: kitāb + an. Das Alif ist stumm." },
-  { ar: "كَثِيرًا", tr: "kaṯīran", hint: "ـًا = „-an“: kaṯīr + an. Alif nicht mitsprechen." },
-  { ar: "شُكْرًا", tr: "šukran", hint: "ـًا = „-an“: šukr + an. Alif nicht mitsprechen." },
+  { ar: "كَثِيرًا", tr: "kathīran", hint: "ـًا = „-an“: kathīr + an. Alif nicht mitsprechen." },
+  { ar: "شُكْرًا", tr: "shukran", hint: "ـًا = „-an“: shukr + an. Alif nicht mitsprechen." },
   { ar: "بَابًا", tr: "bāban", hint: "ـًا = „-an“: bāb + an. Alif stumm." },
   { ar: "عِلْمًا", tr: "ʿilman", hint: "ـًا = „-an“: ʿilm + an. Alif stumm." },
   { ar: "خَيْرًا", tr: "khayran", hint: "ـًا = „-an“: khayr + an. Alif stumm." },
@@ -628,8 +628,8 @@ const PRONUN_MODULES = {
       },
       {
         id: "madd",
-        label: "Madd",
-        rule: "Madd = Vokal dehnen (etwa doppelt so lang). Alif nach Fatha = langes „ā“, Waw nach Damma = langes „ū“, Ya nach Kasra = langes „ī“.",
+        label: "Madd Aslī",
+        rule: "Madd Aslī (natürliches Madd) = Vokal dehnen, etwa doppelt so lang. Alif nach Fatha = langes „ā“, Waw nach Damma = langes „ū“, Ya nach Kasra = langes „ī“. (Die längeren Madd-Arten des Tajwīd sind hier nicht enthalten.)",
         items: PRONUN_MADD,
       },
       // al-Mulk / al-Qalam zeigen die Bedeutung als Hinweis (Vokabeln, keine Regel).
@@ -671,7 +671,7 @@ const GUIDE_LAM = [
   { ar: "الثَّمَر", type: "shamsiya", read: "ath-thamar", de: "die Frucht" },
   { ar: "الدِّين", type: "shamsiya", read: "ad-dīn", de: "die Religion" },
   { ar: "الذَّهَب", type: "shamsiya", read: "adh-dhahab", de: "das Gold" },
-  { ar: "الرَّجُل", type: "shamsiya", read: "ar-raǧul", de: "der Mann" },
+  { ar: "الرَّجُل", type: "shamsiya", read: "ar-rajul", de: "der Mann" },
   { ar: "الزَّيْت", type: "shamsiya", read: "az-zayt", de: "das Öl" },
   { ar: "السَّمَاء", type: "shamsiya", read: "as-samāʾ", de: "der Himmel" },
   { ar: "الشَّمْس", type: "shamsiya", read: "ash-shams", de: "die Sonne" },
@@ -684,12 +684,12 @@ const GUIDE_LAM = [
   // Mondbuchstaben (14): Lam wird gesprochen, Sukun auf dem Lam
   { ar: "الْأَرْض", type: "qamariya", read: "al-arḍ", de: "die Erde" },
   { ar: "الْبَاب", type: "qamariya", read: "al-bāb", de: "die Tür" },
-  { ar: "الْجَبَل", type: "qamariya", read: "al-ǧabal", de: "der Berg" },
+  { ar: "الْجَبَل", type: "qamariya", read: "al-jabal", de: "der Berg" },
   { ar: "الْحَمْد", type: "qamariya", read: "al-ḥamd", de: "das Lob" },
   { ar: "الْخَيْر", type: "qamariya", read: "al-khayr", de: "das Gute" },
   { ar: "الْعِلْم", type: "qamariya", read: "al-ʿilm", de: "das Wissen" },
   { ar: "الْغَيْب", type: "qamariya", read: "al-ghayb", de: "das Verborgene" },
-  { ar: "الْفَجْر", type: "qamariya", read: "al-faǧr", de: "die Morgendämmerung" },
+  { ar: "الْفَجْر", type: "qamariya", read: "al-fajr", de: "die Morgendämmerung" },
   { ar: "الْقَمَر", type: "qamariya", read: "al-qamar", de: "der Mond" },
   { ar: "الْكِتَاب", type: "qamariya", read: "al-kitāb", de: "das Buch" },
   { ar: "الْمَاء", type: "qamariya", read: "al-māʾ", de: "das Wasser" },
@@ -795,7 +795,7 @@ const CHECKLIST = [
   { id: "c04", cat: "harakat", text: "Ich lese Wörter mit Sukūn im Qurʾān (z. B. قَدْ, لَمْ, قُلْ)" },
   { id: "c05", cat: "harakat", text: "Ich lese Wörter mit Tanwīn (رَجُلٌ, كِتَابٍ, شُكْرًا)" },
   { id: "c06", cat: "harakat", text: "Ich lese Wörter mit Shadda im Qurʾān (z. B. إِنَّ, رَبّ, حَقّ)" },
-  { id: "c07", cat: "harakat", text: "Ich lese Wörter mit Madd (قَالَ, يَقُولُ, قِيلَ)" },
+  { id: "c07", cat: "harakat", text: "Ich lese Wörter mit Madd Aslī / natürlichem Madd (قَالَ, يَقُولُ, قِيلَ)" },
   { id: "c08", cat: "lesehilfen", text: "Ich unterscheide Lam Shamsiya und Lam Qamariya (السَّمَاء vs. الْقَمَر)" },
   { id: "c09", cat: "lesehilfen", text: "Ich erkenne die gängigen Waqf-Zeichen" },
   { id: "c10", cat: "woerter", text: "Ich lese 5 einzelne Wörter aus Sūrat al-Mulk" },
@@ -1517,6 +1517,28 @@ function StartScreen({
 
   return (
     <div>
+      {/* Hinweis: Was die App leistet — und was nicht (Tajwīd) */}
+      <div
+        style={{
+          background: "rgba(217,178,95,0.10)",
+          border: `1px solid ${C.line}`,
+          borderRadius: 14,
+          padding: "12px 14px",
+          marginBottom: 16,
+          fontSize: 12.5,
+          color: C.sub,
+          lineHeight: 1.55,
+        }}
+      >
+        <span style={{ color: C.gold, fontWeight: 700 }}>Worum es hier geht: </span>
+        Diese App bringt dir das <b style={{ color: C.ink }}>Lesen</b> bei — Buchstaben und
+        Vokalzeichen erkennen und Wörter und Verse richtig entziffern. Sie bringt dir noch{" "}
+        <b style={{ color: C.ink }}>nicht</b> die feinen Regeln der Koran-Rezitation bei (das
+        „Tajwīd“: wie man beim Vortragen bestimmte Laute zieht, betont oder verschmelzen lässt).
+        Das ist ein eigener Schritt für später. Deshalb steht hier z. B. „Madd Aslī“ – nur die
+        einfache Vokaldehnung, nicht schon alle Dehnungsarten.
+      </div>
+
       {/* Modul waehlen */}
       <div style={card}>
         <div style={{ fontSize: 13, color: C.sub, marginBottom: 10, fontWeight: 600 }}>
