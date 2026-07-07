@@ -486,7 +486,7 @@ const READING_MODULES = {
   },
 };
 
-const MODULE_ORDER = ["letters", "harakat", "words", "ayat"];
+const MODULE_ORDER = ["letters", "harakat", "words", "ayat", "lesehilfen"];
 
 // ============================================================
 //  Wörter lesen (Aussprache-Check-Ablauf)
@@ -650,8 +650,100 @@ const PRONUN_MODULES = {
 };
 
 function getModule(id) {
-  return CHOICE_MODULES[id] || READING_MODULES[id] || PRONUN_MODULES[id];
+  return CHOICE_MODULES[id] || READING_MODULES[id] || PRONUN_MODULES[id] || GUIDE_MODULES[id];
 }
+
+// ============================================================
+//  Lesehilfen — Simulator mit Lernkarten + Quiz je Thema
+//  Thema 1: Lam Shamsiya / Qamariya (Sonnen-/Mondbuchstaben)
+//  Thema 2: Waqf-Zeichen (Pausenzeichen im Mushaf)
+//  Fakten geprüft: Sonnen-/Mondbuchstaben (14+14) und Waqf-Zeichen
+//  nach dem Madinah-Mushaf (König-Fahd-Komplex). Wörter tragen die
+//  echten Marker: Mondbuchstaben Sukun auf dem Lam (الْ), Sonnenbuchstaben
+//  Shadda auf dem Folgebuchstaben (الشّ), Lam stumm.
+// ============================================================
+
+// type: "qamariya" = Lam wird gesprochen; "shamsiya" = Lam stumm, nächster
+// Buchstabe verdoppelt. read = Aussprache, de = Bedeutung.
+const GUIDE_LAM = [
+  // Sonnenbuchstaben (14): Lam stumm, Shadda auf dem Folgebuchstaben
+  { ar: "التِّين", type: "shamsiya", read: "at-tīn", de: "die Feige" },
+  { ar: "الثَّمَر", type: "shamsiya", read: "ath-thamar", de: "die Frucht" },
+  { ar: "الدِّين", type: "shamsiya", read: "ad-dīn", de: "die Religion" },
+  { ar: "الذَّهَب", type: "shamsiya", read: "adh-dhahab", de: "das Gold" },
+  { ar: "الرَّجُل", type: "shamsiya", read: "ar-raǧul", de: "der Mann" },
+  { ar: "الزَّيْت", type: "shamsiya", read: "az-zayt", de: "das Öl" },
+  { ar: "السَّمَاء", type: "shamsiya", read: "as-samāʾ", de: "der Himmel" },
+  { ar: "الشَّمْس", type: "shamsiya", read: "ash-shams", de: "die Sonne" },
+  { ar: "الصَّبْر", type: "shamsiya", read: "aṣ-ṣabr", de: "die Geduld" },
+  { ar: "الضَّيْف", type: "shamsiya", read: "aḍ-ḍayf", de: "der Gast" },
+  { ar: "الطَّرِيق", type: "shamsiya", read: "aṭ-ṭarīq", de: "der Weg" },
+  { ar: "الظُّهْر", type: "shamsiya", read: "aẓ-ẓuhr", de: "der Mittag" },
+  { ar: "اللَّيْل", type: "shamsiya", read: "al-layl", de: "die Nacht" },
+  { ar: "النَّاس", type: "shamsiya", read: "an-nās", de: "die Menschen" },
+  // Mondbuchstaben (14): Lam wird gesprochen, Sukun auf dem Lam
+  { ar: "الْأَرْض", type: "qamariya", read: "al-arḍ", de: "die Erde" },
+  { ar: "الْبَاب", type: "qamariya", read: "al-bāb", de: "die Tür" },
+  { ar: "الْجَبَل", type: "qamariya", read: "al-ǧabal", de: "der Berg" },
+  { ar: "الْحَمْد", type: "qamariya", read: "al-ḥamd", de: "das Lob" },
+  { ar: "الْخَيْر", type: "qamariya", read: "al-khayr", de: "das Gute" },
+  { ar: "الْعِلْم", type: "qamariya", read: "al-ʿilm", de: "das Wissen" },
+  { ar: "الْغَيْب", type: "qamariya", read: "al-ghayb", de: "das Verborgene" },
+  { ar: "الْفَجْر", type: "qamariya", read: "al-faǧr", de: "die Morgendämmerung" },
+  { ar: "الْقَمَر", type: "qamariya", read: "al-qamar", de: "der Mond" },
+  { ar: "الْكِتَاب", type: "qamariya", read: "al-kitāb", de: "das Buch" },
+  { ar: "الْمَاء", type: "qamariya", read: "al-māʾ", de: "das Wasser" },
+  { ar: "الْوَلَد", type: "qamariya", read: "al-walad", de: "das Kind" },
+  { ar: "الْهَوَاء", type: "qamariya", read: "al-hawāʾ", de: "die Luft" },
+  { ar: "الْيَوْم", type: "qamariya", read: "al-yawm", de: "der Tag" },
+];
+
+// Erklärtexte je Typ (für Lernkarte und Quiz-Auflösung).
+const LAM_EXPLAIN = {
+  shamsiya: "Sonnenbuchstabe → Lam Shamsiya: das ل wird NICHT gesprochen, der folgende Buchstabe trägt eine Shadda und wird verdoppelt.",
+  qamariya: "Mondbuchstabe → Lam Qamariya: das ل wird gesprochen (Sukun auf dem Lam: الْ).",
+};
+
+// Waqf-Zeichen (Madinah-Mushaf). sign = Zeichen, name = Bezeichnung,
+// short = Kurzhandlung (Quiz-Option), long = Erklärung.
+const GUIDE_WAQF = [
+  { sign: "م", name: "Waqf Lāzim", short: "Pflicht-Halt", long: "Du MUSST hier anhalten. Weiterlesen würde die Bedeutung verändern." },
+  { sign: "لا", name: "Lā (Waqf Mamnūʿ)", short: "Nicht halten", long: "Hier NICHT anhalten, durchlesen. Nur am Versende (Kreis) ist Halten erlaubt." },
+  { sign: "ج", name: "Waqf Ǧāʾiz", short: "Halten erlaubt", long: "Frei: halten oder weiterlesen, beides gleichwertig." },
+  { sign: "قلى", name: "al-Waqf awlā", short: "Besser halten", long: "Halten ist besser, weiterlesen ist aber erlaubt." },
+  { sign: "صلى", name: "al-Waṣl awlā", short: "Besser weiter", long: "Weiterlesen ist besser, halten ist aber erlaubt." },
+  { sign: "ط", name: "Waqf Muṭlaq", short: "Empfohlener Halt", long: "Guter, empfohlener Halt — hier darfst du gut anhalten." },
+  { sign: "ز", name: "Waqf Muǧawwaz", short: "Halten erlaubt, weiter besser", long: "Halten ist erlaubt, aber weiterlesen ist besser." },
+  { sign: "ص", name: "Waqf Murakhkhaṣ", short: "Halten bei Bedarf", long: "Halten nur bei Bedarf (z. B. Atemnot) erlaubt, sonst weiterlesen." },
+  { sign: "∴ ∴", name: "Muʿānaqa (Taʿānuq)", short: "Nur an EINER Stelle halten", long: "Zwei Dreier-Punktgruppen: Du hältst an EINEM der beiden Punkte — nicht an beiden." },
+  { sign: "س", name: "Saktah", short: "Kurze Pause ohne Atmen", long: "Kurze Atempause OHNE auszuatmen — kürzer als ein normaler Halt." },
+  { sign: "ك", name: "Kadhālika", short: "Wie das vorige Zeichen", long: "„Ebenso“: gleiche Bedeutung wie das zuletzt gezeigte Waqf-Zeichen davor." },
+];
+
+const GUIDE_MODULES = {
+  lesehilfen: {
+    id: "lesehilfen",
+    kind: "guide",
+    title: "Lesehilfen",
+    subtitle: "Erst lernen, dann Quiz — mit Erklärungen",
+    packs: [
+      {
+        id: "lam",
+        label: "Lam Shamsiya / Qamariya",
+        topic: "lam",
+        intro: "Der Artikel ال (al-). Bei Sonnenbuchstaben verschwindet das Lam und der nächste Buchstabe wird verdoppelt (الشَّمْس = „asch-schams“). Bei Mondbuchstaben spricht man das Lam (الْقَمَر = „al-qamar“).",
+        data: GUIDE_LAM,
+      },
+      {
+        id: "waqf",
+        label: "Waqf-Zeichen",
+        topic: "waqf",
+        intro: "Die kleinen Zeichen im Mushaf sagen, wo du anhalten musst, darfst oder nicht. System des Madinah-Mushaf.",
+        data: GUIDE_WAQF,
+      },
+    ],
+  },
+};
 
 // ============================================================
 //  Fortschritts-Statistik (localStorage, nur auf diesem Geraet)
@@ -740,6 +832,7 @@ export default function App() {
   const isReading = curMod.kind === "reading";
   const isChoice = curMod.kind === "choice";
   const isPronun = curMod.kind === "pronunciation";
+  const isGuide = curMod.kind === "guide";
   // curMode nur bei Auswahl-Modulen (nur die haben `modes`).
   const curMode = isChoice ? curMod.modes.find((m) => m.id === mode) : null;
   // "ayat" hat echte Rezitation -> eigener Rezitator-Picker statt TTS-Stimmenliste.
@@ -775,8 +868,8 @@ export default function App() {
   const statLabel = hasPacks
     ? (curMod.packs.find((p) => p.id === packId) || {}).label || curMod.title
     : (curMode && curMode.label) || curMod.title;
-  // Aussprache-Check hat keine Statistik; Auto-Modus ebenfalls nicht.
-  const showStats = !isPronun && !(autoMode && isChoice);
+  // Aussprache-Check und Lesehilfen haben keine gespeicherte Statistik; Auto-Modus ebenfalls nicht.
+  const showStats = !isPronun && !isGuide && !(autoMode && isChoice);
 
   // ---- Stimmen (Text-to-Speech, nur noch fuer Buchstaben/Harakat/Woerter) ----
   const [voices, setVoices] = useState([]);
@@ -965,6 +1058,9 @@ export default function App() {
       setScreen("play");
     } else if (isPronun) {
       // Aussprache-Check verwaltet Index/Aufloesen im eigenen Screen.
+      setScreen("play");
+    } else if (isGuide) {
+      // Lesehilfen verwalten Lern-/Quiz-Phase im eigenen Screen.
       setScreen("play");
     } else {
       setChosen(null);
@@ -1214,6 +1310,16 @@ export default function App() {
           />
         )}
 
+        {screen === "play" && isGuide && curPack && (
+          <GuideScreen
+            key={curPack.id}
+            C={C}
+            fontStack={fontStack}
+            pack={curPack}
+            onExit={() => setScreen("start")}
+          />
+        )}
+
         {screen === "play" && isReading && rItem && (
           <ReadingScreen
             C={C}
@@ -1453,14 +1559,16 @@ function StartScreen({
       {hasPacks && (
         <div style={card}>
           <div style={{ fontSize: 13, color: C.sub, marginBottom: 10, fontWeight: 600 }}>
-            {curMod.kind === "pronunciation" ? "KATEGORIE WÄHLEN" : "INHALT WÄHLEN"}
+            {curMod.kind === "pronunciation" ? "KATEGORIE WÄHLEN" : curMod.kind === "guide" ? "THEMA WÄHLEN" : "INHALT WÄHLEN"}
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             {curMod.packs.map((p) => (
               <button key={p.id} style={pickBtn(packId === p.id)} onClick={() => setPackId(p.id)}>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{p.label}</div>
                 <div style={{ fontSize: 12.5, color: C.sub, marginTop: 3 }}>
-                  {p.items.length} {curMod.kind === "pronunciation" ? "Wörter" : "Karten"}
+                  {curMod.kind === "guide"
+                    ? `${(p.data || []).length} Karten · lernen + Quiz`
+                    : `${p.items.length} ${curMod.kind === "pronunciation" ? "Wörter" : "Karten"}`}
                 </div>
               </button>
             ))}
@@ -2266,6 +2374,356 @@ function PronunciationScreen({ C, fontStack, items, rule, packLabel, onExit }) {
       >
         Beenden
       </button>
+    </div>
+  );
+}
+
+// =====================================================
+//  Lesehilfen-Simulator: Lern-Phase (Karten) + Quiz-Phase (mit Erklärung)
+// =====================================================
+function buildGuideQuiz(pack) {
+  const data = pack.data;
+  if (pack.topic === "lam") {
+    return shuffle(
+      data.map((it) => ({
+        prompt: it.ar,
+        question: "Lam Shamsiya oder Qamariya?",
+        options: [
+          { label: "Lam Shamsiya", correct: it.type === "shamsiya" },
+          { label: "Lam Qamariya", correct: it.type === "qamariya" },
+        ],
+        explain: `${it.read} (${it.de}) — ${LAM_EXPLAIN[it.type]}`,
+      }))
+    );
+  }
+  // waqf: richtige Kurzhandlung + 3 andere als Distraktoren
+  return shuffle(
+    data.map((it) => {
+      const others = shuffle(data.filter((x) => x.sign !== it.sign)).slice(0, 3);
+      const options = shuffle([
+        { label: it.short, correct: true },
+        ...others.map((o) => ({ label: o.short, correct: false })),
+      ]);
+      return {
+        prompt: it.sign,
+        question: "Was bedeutet dieses Zeichen?",
+        options,
+        explain: `${it.name}: ${it.long}`,
+      };
+    })
+  );
+}
+
+function GuideScreen({ C, fontStack, pack, onExit }) {
+  const isLam = pack.topic === "lam";
+  const data = pack.data;
+
+  const [phase, setPhase] = useState("learn"); // learn | quiz | result
+  const [learnIdx, setLearnIdx] = useState(0);
+  const [quiz, setQuiz] = useState(() => buildGuideQuiz(pack));
+  const [qIdx, setQIdx] = useState(0);
+  const [chosen, setChosen] = useState(null);
+  const [correctCount, setCorrectCount] = useState(0);
+
+  const primaryBtn = {
+    flex: 1,
+    padding: "15px",
+    borderRadius: 14,
+    border: "none",
+    background: `linear-gradient(180deg, ${C.green}, ${C.greenD})`,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: 700,
+    cursor: "pointer",
+  };
+  const ghostBtn = {
+    flex: 1,
+    padding: "15px",
+    borderRadius: 14,
+    border: `1px solid ${C.line}`,
+    background: C.panel2,
+    color: C.ink,
+    fontSize: 16,
+    fontWeight: 700,
+    cursor: "pointer",
+  };
+  const exitBtn = {
+    width: "100%",
+    padding: "14px",
+    borderRadius: 14,
+    border: `1px solid ${C.gold}`,
+    background: "transparent",
+    color: C.gold,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: "pointer",
+    marginTop: 12,
+  };
+  const headBar = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    background: C.panel,
+    border: `1px solid ${C.line}`,
+    borderRadius: 14,
+    padding: "12px 14px",
+    marginBottom: 14,
+  };
+  const pill = {
+    fontSize: 12.5,
+    color: C.gold,
+    border: `1px solid ${C.line}`,
+    borderRadius: 999,
+    padding: "4px 12px",
+  };
+  const bigPrompt = (text) => (
+    <div
+      key={text}
+      style={{
+        fontFamily: fontStack,
+        fontSize: text.length > 6 ? 44 : 64,
+        lineHeight: 1.3,
+        direction: "rtl",
+        color: C.ink,
+        animation: "pop .18s ease",
+        minHeight: 96,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {text}
+    </div>
+  );
+
+  // ---------- LERN-PHASE ----------
+  if (phase === "learn") {
+    const c = data[learnIdx];
+    const last = learnIdx >= data.length - 1;
+    return (
+      <div>
+        <div style={headBar}>
+          <span style={{ fontSize: 13, color: C.sub, fontWeight: 600 }}>{pack.label} · Lernen</span>
+          <span style={pill}>{learnIdx + 1} / {data.length}</span>
+        </div>
+
+        <div style={{ fontSize: 12.5, color: C.sub, lineHeight: 1.5, marginBottom: 14 }}>
+          {pack.intro}
+        </div>
+
+        <div
+          style={{
+            background: C.panel,
+            border: `1px solid ${C.line}`,
+            borderRadius: 18,
+            padding: "22px 18px 24px",
+            textAlign: "center",
+            marginBottom: 14,
+          }}
+        >
+          {isLam ? (
+            <>
+              {bigPrompt(c.ar)}
+              <div
+                style={{
+                  display: "inline-block",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: c.type === "shamsiya" ? C.gold : C.green,
+                  border: `1px solid ${C.line}`,
+                  borderRadius: 999,
+                  padding: "4px 14px",
+                  margin: "4px 0 10px",
+                }}
+              >
+                {c.type === "shamsiya" ? "Lam Shamsiya" : "Lam Qamariya"}
+              </div>
+              <div style={{ color: C.gold, fontSize: 18, fontWeight: 700 }}>{c.read}</div>
+              <div style={{ color: C.sub, fontSize: 14, marginTop: 2 }}>{c.de}</div>
+              <div style={{ color: C.sub, fontSize: 13.5, marginTop: 10, lineHeight: 1.55 }}>
+                {LAM_EXPLAIN[c.type]}
+              </div>
+            </>
+          ) : (
+            <>
+              {bigPrompt(c.sign)}
+              <div style={{ color: C.gold, fontSize: 18, fontWeight: 700 }}>{c.name}</div>
+              <div style={{ color: C.ink, fontSize: 15, fontWeight: 600, marginTop: 4 }}>{c.short}</div>
+              <div style={{ color: C.sub, fontSize: 13.5, marginTop: 10, lineHeight: 1.55 }}>{c.long}</div>
+            </>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            style={{ ...ghostBtn, opacity: learnIdx === 0 ? 0.4 : 1 }}
+            disabled={learnIdx === 0}
+            onClick={() => setLearnIdx((i) => Math.max(0, i - 1))}
+          >
+            Zurück
+          </button>
+          {last ? (
+            <button style={primaryBtn} onClick={() => setPhase("quiz")}>
+              Zum Quiz →
+            </button>
+          ) : (
+            <button style={primaryBtn} onClick={() => setLearnIdx((i) => i + 1)}>
+              Weiter
+            </button>
+          )}
+        </div>
+        <button style={exitBtn} onClick={onExit}>Beenden</button>
+      </div>
+    );
+  }
+
+  // ---------- QUIZ-PHASE ----------
+  if (phase === "quiz") {
+    const q = quiz[qIdx];
+    const answered = chosen !== null;
+    const last = qIdx >= quiz.length - 1;
+    function choose(i) {
+      if (answered) return;
+      setChosen(i);
+      if (q.options[i].correct) setCorrectCount((n) => n + 1);
+    }
+    function nextQ() {
+      if (last) {
+        setPhase("result");
+      } else {
+        setQIdx((i) => i + 1);
+        setChosen(null);
+      }
+    }
+    return (
+      <div>
+        <div style={headBar}>
+          <span style={{ fontSize: 13, color: C.sub, fontWeight: 600 }}>{pack.label} · Quiz</span>
+          <span style={pill}>{qIdx + 1} / {quiz.length} · {correctCount} richtig</span>
+        </div>
+
+        <div
+          style={{
+            background: C.panel,
+            border: `1px solid ${C.line}`,
+            borderRadius: 18,
+            padding: "20px 18px 22px",
+            textAlign: "center",
+            marginBottom: 14,
+          }}
+        >
+          {bigPrompt(q.prompt)}
+          <div style={{ color: C.sub, fontSize: 15 }}>{q.question}</div>
+        </div>
+
+        <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+          {q.options.map((opt, i) => {
+            let bg = C.panel2, border = C.line;
+            if (answered && i === chosen) {
+              bg = opt.correct ? "rgba(63,174,107,.2)" : "rgba(201,88,79,.2)";
+              border = opt.correct ? C.green : C.red;
+            }
+            if (answered && opt.correct && i !== chosen) {
+              bg = "rgba(63,174,107,.12)";
+              border = C.green;
+            }
+            return (
+              <button
+                key={i}
+                onClick={() => choose(i)}
+                disabled={answered}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  border: `1.5px solid ${border}`,
+                  background: bg,
+                  color: C.ink,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: answered ? "default" : "pointer",
+                  textAlign: "center",
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {answered && (
+          <div
+            style={{
+              background: C.panel2,
+              border: `1px solid ${C.line}`,
+              borderRadius: 12,
+              padding: "12px 14px",
+              marginBottom: 12,
+              color: C.sub,
+              fontSize: 13.5,
+              lineHeight: 1.55,
+            }}
+          >
+            {q.explain}
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            style={{ ...primaryBtn, opacity: answered ? 1 : 0.4 }}
+            disabled={!answered}
+            onClick={nextQ}
+          >
+            {last ? "Ergebnis" : "Weiter"}
+          </button>
+        </div>
+        <button style={exitBtn} onClick={onExit}>Beenden</button>
+      </div>
+    );
+  }
+
+  // ---------- ERGEBNIS ----------
+  const pct = quiz.length ? Math.round((correctCount / quiz.length) * 100) : 0;
+  return (
+    <div
+      style={{
+        background: C.panel,
+        border: `1px solid ${C.line}`,
+        borderRadius: 18,
+        padding: 22,
+        textAlign: "center",
+      }}
+    >
+      <div style={{ fontFamily: fontStack, fontSize: 38, color: C.gold }}>تم</div>
+      <h2 style={{ margin: "6px 0 2px", fontSize: 21 }}>Quiz beendet</h2>
+      <p style={{ margin: "0 0 16px", color: C.sub, fontSize: 14 }}>{pack.label}</p>
+      <div style={{ fontSize: 34, fontWeight: 800, color: pct >= 80 ? C.green : C.ink }}>
+        {correctCount} / {quiz.length}
+      </div>
+      <div style={{ color: C.sub, fontSize: 14, marginBottom: 18 }}>{pct} % richtig</div>
+      <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+        <button
+          style={primaryBtn}
+          onClick={() => {
+            setQuiz(buildGuideQuiz(pack));
+            setQIdx(0);
+            setChosen(null);
+            setCorrectCount(0);
+            setPhase("quiz");
+          }}
+        >
+          Quiz nochmal
+        </button>
+        <button
+          style={ghostBtn}
+          onClick={() => {
+            setLearnIdx(0);
+            setPhase("learn");
+          }}
+        >
+          Nochmal lernen
+        </button>
+      </div>
+      <button style={exitBtn} onClick={onExit}>Beenden</button>
     </div>
   );
 }
