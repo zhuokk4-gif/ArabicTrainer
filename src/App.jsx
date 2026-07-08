@@ -530,23 +530,23 @@ const PRONUN_SUKUN = [
 // Alif (ـًا), das NICHT als langes „a“ mitgesprochen wird.
 const PRONUN_TANWIN = [
   { ar: "رَجُلٌ", tr: "rajulun", hint: "Endung ٌ (Tanwin Damma) = „-un“: rajul + un." },
-  { ar: "كِتَابٌ", tr: "kitābun", hint: "ٌ am Ende = „-un“: kitāb + un." },
-  { ar: "عَلِيمٌ", tr: "ʿalīmun", hint: "ٌ = „-un“: ʿalīm + un." },
   { ar: "وَلَدٌ", tr: "waladun", hint: "ٌ = „-un“: walad + un." },
   { ar: "بَيْتٌ", tr: "baytun", hint: "ٌ = „-un“: bayt + un." },
   { ar: "رِزْقٌ", tr: "rizqun", hint: "ٌ = „-un“: rizq + un." },
-  { ar: "كِتَابٍ", tr: "kitābin", hint: "Endung ٍ (Tanwin Kasra) = „-in“: kitāb + in." },
-  { ar: "يَوْمٍ", tr: "yawmin", hint: "ٍ = „-in“: yawm + in." },
+  { ar: "كَلْبٌ", tr: "kalbun", hint: "ٌ = „-un“: kalb + un." },
+  { ar: "عَبْدٌ", tr: "ʿabdun", hint: "ٌ = „-un“: ʿabd + un." },
+  { ar: "يَوْمٍ", tr: "yawmin", hint: "Endung ٍ (Tanwin Kasra) = „-in“: yawm + in." },
   { ar: "قَوْمٍ", tr: "qawmin", hint: "ٍ = „-in“: qawm + in." },
   { ar: "بَيْتٍ", tr: "baytin", hint: "ٍ = „-in“: bayt + in." },
   { ar: "رَجُلٍ", tr: "rajulin", hint: "ٍ = „-in“: rajul + in." },
   { ar: "شَيْءٍ", tr: "shayʾin", hint: "ٍ = „-in“: shayʾ + in." },
-  { ar: "كِتَابًا", tr: "kitāban", hint: "Endung ـًا (Tanwin Fatha) = „-an“: kitāb + an. Das Alif ist stumm." },
-  { ar: "كَثِيرًا", tr: "kathīran", hint: "ـًا = „-an“: kathīr + an. Alif nicht mitsprechen." },
-  { ar: "شُكْرًا", tr: "shukran", hint: "ـًا = „-an“: shukr + an. Alif nicht mitsprechen." },
-  { ar: "بَابًا", tr: "bāban", hint: "ـًا = „-an“: bāb + an. Alif stumm." },
+  { ar: "نَفْسٍ", tr: "nafsin", hint: "ٍ = „-in“: nafs + in." },
+  { ar: "شُكْرًا", tr: "shukran", hint: "Endung ـًا (Tanwin Fatha) = „-an“: shukr + an. Das Alif ist stumm." },
   { ar: "عِلْمًا", tr: "ʿilman", hint: "ـًا = „-an“: ʿilm + an. Alif stumm." },
   { ar: "خَيْرًا", tr: "khayran", hint: "ـًا = „-an“: khayr + an. Alif stumm." },
+  { ar: "حَمْدًا", tr: "ḥamdan", hint: "ـًا = „-an“: ḥamd + an. Alif stumm." },
+  { ar: "فَضْلًا", tr: "faḍlan", hint: "ـًا = „-an“: faḍl + an. Alif stumm." },
+  { ar: "وَعْدًا", tr: "waʿdan", hint: "ـًا = „-an“: waʿd + an. Alif stumm." },
 ];
 
 // Vokabel-Listen ({ar,tr,de}) in Aussprache-Items ({ar,tr,hint}) umwandeln:
@@ -2317,11 +2317,13 @@ function ReadingScreen({
 //  -> nächstes Wort. Enter/Leertaste als Tastatur-Shortcut. Keine Statistik.
 // =====================================================
 function PronunciationScreen({ C, fontStack, items, rule, packLabel, onExit }) {
+  // Beim Start einmal mischen, damit man die Reihenfolge nicht auswendig lernt.
+  const [deck] = useState(() => shuffle(items));
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
 
-  const item = items[idx];
-  const isLast = idx >= items.length - 1;
+  const item = deck[idx];
+  const isLast = idx >= deck.length - 1;
   const long = item.ar.length > 14;
 
   function reveal() {
@@ -2386,7 +2388,7 @@ function PronunciationScreen({ C, fontStack, items, rule, packLabel, onExit }) {
             padding: "4px 12px",
           }}
         >
-          {idx + 1} / {items.length}
+          {idx + 1} / {deck.length}
         </span>
       </div>
 
