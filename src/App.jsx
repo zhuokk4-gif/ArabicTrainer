@@ -1539,16 +1539,16 @@ function ArabTrainerApp() {
     const item = rQueue[rIdx];
     if (!audio || !item) return;
 
-    // Naechsten Vers im Hintergrund vorladen — sonst haengt der Uebergang
-    // an der Netzwerk-Ladezeit der naechsten Datei ("abbrechen" zw. Ayat).
+    // Naechsten Vers im Hintergrund vorladen — per fetch() statt Audio-
+    // Element, weil iOS Safari das Vorladen von <audio> ohne Geste blockt,
+    // fetch() aber nicht. no-cors, weil everyayah.com evtl. kein CORS sendet;
+    // fuellt trotzdem den HTTP-Cache fuer den naechsten <audio src>-Zugriff.
     const nextItem = rQueue[rIdx + 1];
     if (nextItem && nextItem.surah && nextItem.ayah) {
       const nextUrl = ayahAudioUrl(reciterFolder, nextItem.surah, nextItem.ayah);
       if (preloadedUrlRef.current !== nextUrl) {
         preloadedUrlRef.current = nextUrl;
-        const pre = new Audio();
-        pre.preload = "auto";
-        pre.src = nextUrl;
+        fetch(nextUrl, { mode: "no-cors" }).catch(() => {});
       }
     }
 
@@ -1567,16 +1567,13 @@ function ArabTrainerApp() {
       }
     };
 
+    // 'ended' ist das eigentliche Signal. Der Sicherheits-Timer ist nur ein
+    // fester Deckel als Netz (nicht mehr an audio.duration gekoppelt — die
+    // ist bei manchen MP3s unzuverlaessig/Infinity und liess den Timer auf
+    // 30s hochschnellen, was wie ein Haenger wirkte).
     const onEnded = () => advance();
-    const onMeta = () => {
-      if (safety) clearTimeout(safety);
-      const ms = (audio.duration / (rate || 1)) * 1000 + 2500;
-      safety = setTimeout(advance, isFinite(ms) && ms > 0 ? ms : 30000);
-    };
-
     audio.addEventListener("ended", onEnded);
-    audio.addEventListener("loadedmetadata", onMeta);
-    safety = setTimeout(advance, 30000); // grober Deckel bis Metadaten da sind
+    safety = setTimeout(advance, 18000);
 
     if (skipNextAutoPlayRef.current) {
       // Wurde gerade schon synchron im Tap gestartet (siehe onSpeak/onStartTap) —
@@ -1588,7 +1585,6 @@ function ArabTrainerApp() {
 
     return () => {
       audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("loadedmetadata", onMeta);
       if (safety) clearTimeout(safety);
     };
     // playReadingAudio je Render neu erzeugt -> bewusst nicht in den Deps
