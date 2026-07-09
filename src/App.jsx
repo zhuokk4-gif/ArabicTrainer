@@ -1255,6 +1255,24 @@ export default function App() {
   // preservesPitch erhalten, damit Langsamer-Stellen nicht brummt.
   const [rate, setRate] = useState(1);
 
+  // Ob gerade wirklich etwas hoerbar ist (Datei ODER TTS-Fallback) — damit
+  // die Isti'adha/Basmala-Box verschwinden kann, sobald die Stimme einsetzt.
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  useEffect(() => {
+    const audio = audioElRef.current;
+    if (!audio) return;
+    const onPlay = () => setAudioPlaying(true);
+    const onStop = () => setAudioPlaying(false);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onStop);
+    audio.addEventListener("ended", onStop);
+    return () => {
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onStop);
+      audio.removeEventListener("ended", onStop);
+    };
+  }, []);
+
   // Timer fuer den Auto-Modus (Aufdecken + Pause bis zur naechsten Frage)
   const autoRevealTimerRef = useRef(null);
   const autoPauseTimerRef = useRef(null);
@@ -1299,6 +1317,9 @@ export default function App() {
     if (selectedVoice) u.voice = selectedVoice;
     u.lang = selectedVoice ? selectedVoice.lang : "ar-SA";
     u.rate = 0.85;
+    u.onstart = () => setAudioPlaying(true);
+    u.onend = () => setAudioPlaying(false);
+    u.onerror = () => setAudioPlaying(false);
     synth.speak(u);
   }
 
@@ -1822,6 +1843,7 @@ export default function App() {
             onTogglePause={() => setFollowPaused((v) => !v)}
             awaitingStart={followMode && rIdx === 0 && awaitingTapToStart}
             onStartTap={() => setAwaitingTapToStart(false)}
+            playing={audioPlaying}
           />
         )}
 
@@ -2562,7 +2584,7 @@ function PlayScreen({
 function ReadingScreen({
   C, fontStack, item, note, pos, total, revealed,
   onReveal, onRate, onSpeak, onFinish, correct, wrong, streak,
-  follow, paused, onTogglePause, awaitingStart, onStartTap,
+  follow, paused, onTogglePause, awaitingStart, onStartTap, playing,
 }) {
   const stat = (label, val, color) => (
     <div style={{ textAlign: "center" }}>
@@ -2570,6 +2592,17 @@ function ReadingScreen({
       <div style={{ fontSize: 20, fontWeight: 700, color: color || C.ink }}>{val}</div>
     </div>
   );
+
+  // Isti'adha/Basmala-Box: verschwindet, sobald die Rezitation fuer diese
+  // Karte einmal losgelaufen ist (Datei oder TTS) — bleibt dann auch nach
+  // Pause/Ende versteckt, kommt erst bei der naechsten Karte wieder infrage.
+  const [voiceStarted, setVoiceStarted] = useState(false);
+  useEffect(() => {
+    setVoiceStarted(false);
+  }, [item.ar]);
+  useEffect(() => {
+    if (playing) setVoiceStarted(true);
+  }, [playing]);
 
   // Vers = hat surah+ayah -> deutsche Übersetzung live von quranenc laden.
   // Wort ohne surah/ayah -> weiterhin das kurze Glossar (item.de).
@@ -2681,7 +2714,7 @@ function ReadingScreen({
           </button>
         </div>
 
-        {(pos === 1 || (isAyah && item.ayah === 1)) && (
+        {(pos === 1 || (isAyah && item.ayah === 1)) && !voiceStarted && (
           <div
             onClick={awaitingStart ? onStartTap : undefined}
             style={{
