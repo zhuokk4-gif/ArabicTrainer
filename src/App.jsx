@@ -32,6 +32,7 @@ const RECITERS = [
   { id: "husary", label: "Mahmoud Al-Husary", folder: "Husary_128kbps", note: "Sehr deutliche Aussprache, oft für Lernende empfohlen" },
   { id: "abdulbasit", label: "Abdul Basit (Murattal)", folder: "Abdul_Basit_Murattal_192kbps", note: "Ruhiges Tempo" },
   { id: "sudais", label: "Abdurrahman As-Sudais", folder: "Abdurrahmaan_As-Sudais_192kbps", note: "Imam der Haram-Moschee Mekka" },
+  { id: "muaiqly", label: "Maher Al Muaiqly", folder: "MaherAlMuaiqly128kbps", note: "Imam der Haram-Moschee Mekka" },
 ];
 
 function pad3(n) {
@@ -337,11 +338,13 @@ const HAQQA_1_10 = tagAyat([
   { ar: "فَعَصَوْا رَسُولَ رَبِّهِمْ فَأَخَذَهُمْ أَخْذَةً رَّابِيَةً", tr: "fa-ʿaṣaw rasūla rabbihim fa-akhadhahum akhdhatan rābiya"  },
 ], 69, 1);
 
-// --- Surat al-Maʿārij (70): AUSZUG (Ayat 1-10) — noch zu vervollstaendigen ---
-// Die Sure hat 44 Verse. Ich trage hier bewusst nur die ersten als
-// gepruefte Grundlage ein und lasse den Rest offen, statt 44 Verse aus
-// dem Gedaechtnis zu erfinden. Rest aus tanzil.net / api.quran.com ergaenzen.
-const MAARIJ_EXCERPT = tagAyat([
+// --- Surat al-Maʿārij (70): VOLLSTAENDIG (Ayat 1-44) ---
+// Ayah 1-10 wie zuvor. Ayah 11-44 ergaenzt und gegen quran.com / alim.org
+// (Uthmani-Text) abgeglichen; Rasm auf klare Lernschreibung normalisiert
+// (durchgehend punktiertes ي, kein Wasla-Alif ٱ, keine Zier-Recitationszeichen) —
+// wie auch bei Ayah 1-10 gehandhabt. Trotzdem: vor dem Lernen mit einem
+// Mushaf abgleichen (siehe QURAN_NOTE).
+const MAARIJ_1_44 = tagAyat([
   { ar: "سَأَلَ سَائِلٌ بِعَذَابٍ وَاقِعٍ", tr: "saʾala sāʾilun bi-ʿadhābin wāqiʿ"  },
   { ar: "لِّلْكَافِرِينَ لَيْسَ لَهُ دَافِعٌ", tr: "li-l-kāfirīna laysa lahu dāfiʿ"  },
   { ar: "مِّنَ اللَّهِ ذِي الْمَعَارِجِ", tr: "mina llāhi dhī l-maʿārij"  },
@@ -352,6 +355,40 @@ const MAARIJ_EXCERPT = tagAyat([
   { ar: "يَوْمَ تَكُونُ السَّمَاءُ كَالْمُهْلِ", tr: "yawma takūnu s-samāʾu ka-l-muhl"  },
   { ar: "وَتَكُونُ الْجِبَالُ كَالْعِهْنِ", tr: "wa-takūnu l-jibālu ka-l-ʿihn"  },
   { ar: "وَلَا يَسْأَلُ حَمِيمٌ حَمِيمًا", tr: "wa-lā yasʾalu ḥamīmun ḥamīmā"  },
+  { ar: "يُبَصَّرُونَهُمْ ۚ يَوَدُّ الْمُجْرِمُ لَوْ يَفْتَدِي مِنْ عَذَابِ يَوْمِئِذٍ بِبَنِيهِ", tr: "yubaṣṣarūnahum, yawaddu l-mujrimu law yaftadī min ʿadhābi yawmiʾidhin bi-banīh"  },
+  { ar: "وَصَاحِبَتِهِ وَأَخِيهِ", tr: "wa-ṣāḥibatihi wa-akhīh"  },
+  { ar: "وَفَصِيلَتِهِ الَّتِي تُؤْوِيهِ", tr: "wa-faṣīlatihi llatī tuʾwīh"  },
+  { ar: "وَمَنْ فِي الْأَرْضِ جَمِيعًا ثُمَّ يُنجِيهِ", tr: "wa-man fi l-arḍi jamīʿan thumma yunjīh"  },
+  { ar: "كَلَّا ۖ إِنَّهَا لَظَىٰ", tr: "kallā, innahā laẓā"  },
+  { ar: "نَزَّاعَةً لِّلشَّوَىٰ", tr: "nazzāʿatan li-sh-shawā"  },
+  { ar: "تَدْعُوا مَنْ أَدْبَرَ وَتَوَلَّىٰ", tr: "tadʿū man adbara wa-tawallā"  },
+  { ar: "وَجَمَعَ فَأَوْعَىٰ", tr: "wa-jamaʿa fa-awʿā"  },
+  { ar: "إِنَّ الْإِنسَانَ خُلِقَ هَلُوعًا", tr: "inna l-insāna khuliqa halūʿā"  },
+  { ar: "إِذَا مَسَّهُ الشَّرُّ جَزُوعًا", tr: "idhā massahu sh-sharru jazūʿā"  },
+  { ar: "وَإِذَا مَسَّهُ الْخَيْرُ مَنُوعًا", tr: "wa-idhā massahu l-khayru manūʿā"  },
+  { ar: "إِلَّا الْمُصَلِّينَ", tr: "illā l-muṣallīn"  },
+  { ar: "الَّذِينَ هُمْ عَلَىٰ صَلَاتِهِمْ دَائِمُونَ", tr: "alladhīna hum ʿalā ṣalātihim dāʾimūn"  },
+  { ar: "وَالَّذِينَ فِي أَمْوَالِهِمْ حَقٌّ مَّعْلُومٌ", tr: "wa-lladhīna fī amwālihim ḥaqqun maʿlūm"  },
+  { ar: "لِّلسَّائِلِ وَالْمَحْرُومِ", tr: "li-s-sāʾili wa-l-maḥrūm"  },
+  { ar: "وَالَّذِينَ يُصَدِّقُونَ بِيَوْمِ الدِّينِ", tr: "wa-lladhīna yuṣaddiqūna bi-yawmi d-dīn"  },
+  { ar: "وَالَّذِينَ هُم مِّنْ عَذَابِ رَبِّهِم مُّشْفِقُونَ", tr: "wa-lladhīna hum min ʿadhābi rabbihim mushfiqūn"  },
+  { ar: "إِنَّ عَذَابَ رَبِّهِمْ غَيْرُ مَأْمُونٍ", tr: "inna ʿadhāba rabbihim ghayru maʾmūn"  },
+  { ar: "وَالَّذِينَ هُمْ لِفُرُوجِهِمْ حَافِظُونَ", tr: "wa-lladhīna hum li-furūjihim ḥāfiẓūn"  },
+  { ar: "إِلَّا عَلَىٰ أَزْوَاجِهِمْ أَوْ مَا مَلَكَتْ أَيْمَانُهُمْ فَإِنَّهُمْ غَيْرُ مَلُومِينَ", tr: "illā ʿalā azwājihim aw mā malakat aymānuhum fa-innahum ghayru malūmīn"  },
+  { ar: "فَمَنِ ابْتَغَىٰ وَرَاءَ ذَٰلِكَ فَأُولَٰئِكَ هُمُ الْعَادُونَ", tr: "fa-mani btaghā warāʾa dhālika fa-ulāʾika humu l-ʿādūn"  },
+  { ar: "وَالَّذِينَ هُمْ لِأَمَانَاتِهِمْ وَعَهْدِهِمْ رَاعُونَ", tr: "wa-lladhīna hum li-amānātihim wa-ʿahdihim rāʿūn"  },
+  { ar: "وَالَّذِينَ هُم بِشَهَادَاتِهِمْ قَائِمُونَ", tr: "wa-lladhīna hum bi-shahādātihim qāʾimūn"  },
+  { ar: "وَالَّذِينَ هُمْ عَلَىٰ صَلَاتِهِمْ يُحَافِظُونَ", tr: "wa-lladhīna hum ʿalā ṣalātihim yuḥāfiẓūn"  },
+  { ar: "أُولَٰئِكَ فِي جَنَّاتٍ مُّكْرَمُونَ", tr: "ulāʾika fī jannātin mukramūn"  },
+  { ar: "فَمَالِ الَّذِينَ كَفَرُوا قِبَلَكَ مُهْطِعِينَ", tr: "fa-māli lladhīna kafarū qibalaka muhṭiʿīn"  },
+  { ar: "عَنِ الْيَمِينِ وَعَنِ الشِّمَالِ عِزِينَ", tr: "ʿani l-yamīni wa-ʿani sh-shimāli ʿizīn"  },
+  { ar: "أَيَطْمَعُ كُلُّ امْرِئٍ مِّنْهُمْ أَن يُدْخَلَ جَنَّةَ نَعِيمٍ", tr: "a-yaṭmaʿu kullu mriʾin minhum an yudkhala jannata naʿīm"  },
+  { ar: "كَلَّا ۖ إِنَّا خَلَقْنَاهُم مِّمَّا يَعْلَمُونَ", tr: "kallā, innā khalaqnāhum mimmā yaʿlamūn"  },
+  { ar: "فَلَا أُقْسِمُ بِرَبِّ الْمَشَارِقِ وَالْمَغَارِبِ إِنَّا لَقَادِرُونَ", tr: "fa-lā uqsimu bi-rabbi l-mashāriqi wa-l-maghāribi innā la-qādirūn"  },
+  { ar: "عَلَىٰ أَن نُّبَدِّلَ خَيْرًا مِّنْهُمْ وَمَا نَحْنُ بِمَسْبُوقِينَ", tr: "ʿalā an nubaddila khayran minhum wa-mā naḥnu bi-masbūqīn"  },
+  { ar: "فَذَرْهُمْ يَخُوضُوا وَيَلْعَبُوا حَتَّىٰ يُلَاقُوا يَوْمَهُمُ الَّذِي يُوعَدُونَ", tr: "fa-dharhum yakhūḍū wa-yalʿabū ḥattā yulāqū yawmahumu lladhī yūʿadūn"  },
+  { ar: "يَوْمَ يَخْرُجُونَ مِنَ الْأَجْدَاثِ سِرَاعًا كَأَنَّهُمْ إِلَىٰ نُصُبٍ يُوفِضُونَ", tr: "yawma yakhrujūna mina l-ajdāthi sirāʿan ka-annahum ilā nuṣubin yūfiḍūn"  },
+  { ar: "خَاشِعَةً أَبْصَارُهُمْ تَرْهَقُهُمْ ذِلَّةٌ ۚ ذَٰلِكَ الْيَوْمُ الَّذِي كَانُوا يُوعَدُونَ", tr: "khāshiʿatan abṣāruhum tarhaquhum dhillah, dhālika l-yawmu lladhī kānū yūʿadūn"  },
 ], 70, 1);
 
 // 3 Suren am Stueck: aus den oben abgedeckten Ayat zusammengesetzt
@@ -359,6 +396,14 @@ const MAARIJ_EXCERPT = tagAyat([
 const DREI_SUREN = [...MULK_1_5, ...MULK_6_11, ...QALAM_1_16, ...HAQQA_1_10];
 
 const QURAN_NOTE = "Text vor dem Lernen mit einem zuverlässigen Mushaf abgleichen.";
+
+// Isti'adha + Basmala: wird in ReadingScreen nur auf der jeweils ersten
+// Karte eines Lese-Durchgangs eingeblendet (schlicht, ohne weitere Zier-
+// zeichen — die Umschrift ist eine gaengige, keine 1:1-Transliteration).
+const OPENING_FORMULA = {
+  isti: { ar: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ", tr: "aʿūdhu billāhi mina sh-shayṭāni r-rajīm" },
+  basmala: { ar: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", tr: "bismillāhi r-raḥmāni r-raḥīm" },
+};
 
 // ---- Hilfsfunktionen ----
 function shuffle(arr) {
@@ -564,7 +609,7 @@ const READING_MODULES = {
       { id: "mulk611", label: "al-Mulk — Ayah 6–11", items: MULK_6_11, note: QURAN_NOTE },
       { id: "qalam116", label: "al-Qalam — Ayah 1–16", items: QALAM_1_16, note: QURAN_NOTE },
       { id: "haqqa110", label: "al-Haqqa — Ayah 1–10", items: HAQQA_1_10, note: QURAN_NOTE },
-      { id: "maarij", label: "al-Maʿārij — Auszug (1–10)", items: MAARIJ_EXCERPT, note: QURAN_NOTE + " Sure noch unvollständig (44 Verse)." },
+      { id: "maarij", label: "al-Maʿārij — komplett (1–44)", items: MAARIJ_1_44, note: QURAN_NOTE },
       { id: "drei", label: "3 Suren am Stück (abgedeckte Ayat)", items: DREI_SUREN, note: QURAN_NOTE },
     ],
   },
@@ -2499,6 +2544,32 @@ function ReadingScreen({
             🔊
           </button>
         </div>
+
+        {pos === 1 && (
+          <div
+            style={{
+              borderBottom: `1px solid ${C.line}`,
+              marginBottom: 14,
+              paddingBottom: 12,
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontFamily: fontStack, direction: "rtl", fontSize: 22, color: C.sub, marginBottom: 2 }}>
+              {OPENING_FORMULA.isti.ar}
+            </div>
+            <div style={{ fontSize: 11.5, color: C.sub, marginBottom: isAyah && item.ayah === 1 ? 10 : 0 }}>
+              {OPENING_FORMULA.isti.tr}
+            </div>
+            {isAyah && item.ayah === 1 && (
+              <>
+                <div style={{ fontFamily: fontStack, direction: "rtl", fontSize: 22, color: C.sub, marginBottom: 2 }}>
+                  {OPENING_FORMULA.basmala.ar}
+                </div>
+                <div style={{ fontSize: 11.5, color: C.sub }}>{OPENING_FORMULA.basmala.tr}</div>
+              </>
+            )}
+          </div>
+        )}
 
         {note && (
           <div style={{ color: C.sub, fontSize: 11.5, marginBottom: 10, lineHeight: 1.4 }}>
