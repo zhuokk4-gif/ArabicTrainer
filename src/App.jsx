@@ -1157,7 +1157,76 @@ async function fetchAburida(surah, ayah) {
   return String(t).replace(/\s+/g, " ").trim();
 }
 
+// Faengt Render-Fehler ab, statt die ganze Seite bei fremden Nutzern weiss
+// werden zu lassen. Zeigt einen Neu-laden-Hinweis statt eines Absturzes.
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    // Bewusst kein console.error im Produktivbetrieb-Rauschen, aber fuer
+    // Debugging beim Entwickeln hilfreich:
+    if (typeof window !== "undefined" && window.location.hostname === "localhost") {
+      // eslint-disable-next-line no-console
+      console.error(error, info);
+    }
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 14,
+            padding: 24,
+            textAlign: "center",
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
+            background: "#0f1b14",
+            color: "#eaf3ec",
+          }}
+        >
+          <div style={{ fontSize: 17, fontWeight: 700 }}>Etwas ist schiefgelaufen.</div>
+          <div style={{ fontSize: 14, opacity: 0.75, maxWidth: 320 }}>
+            Bitte die Seite neu laden. Dein gespeicherter Fortschritt (Checkliste, Statistik) bleibt erhalten.
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: "10px 20px",
+              borderRadius: 10,
+              border: "none",
+              background: "#d9b25f",
+              color: "#1a1a1a",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Seite neu laden
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
+  return (
+    <ErrorBoundary>
+      <ArabTrainerApp />
+    </ErrorBoundary>
+  );
+}
+
+function ArabTrainerApp() {
   const [screen, setScreen] = useState("start"); // start | play | result
 
   // Modul-/Modus-Auswahl
@@ -1250,7 +1319,13 @@ export default function App() {
   // ---- Echte Rezitation (Verse & Suren) ----
   const [reciterId, setReciterId] = useState(RECITERS[0].id);
   const reciterFolder = (RECITERS.find((r) => r.id === reciterId) || RECITERS[0]).folder;
-  const audioElRef = useRef(typeof window !== "undefined" ? new Audio() : null);
+  // Lazy statt als useRef-Argument: sonst wuerde bei JEDEM Render ein neues
+  // Audio()-Objekt erzeugt (und sofort verworfen) — spuerbar waehrend des
+  // 250ms-Timers im Uebungsbildschirm.
+  const audioElRef = useRef(null);
+  if (audioElRef.current === null && typeof window !== "undefined") {
+    audioElRef.current = new Audio();
+  }
   // Wiedergabetempo der Rezitation (1 = Originaltempo). Tonhoehe bleibt via
   // preservesPitch erhalten, damit Langsamer-Stellen nicht brummt.
   const [rate, setRate] = useState(1);
@@ -2717,6 +2792,18 @@ function ReadingScreen({
         {(pos === 1 || (isAyah && item.ayah === 1)) && !voiceStarted && (
           <div
             onClick={awaitingStart ? onStartTap : undefined}
+            role={awaitingStart ? "button" : undefined}
+            tabIndex={awaitingStart ? 0 : undefined}
+            onKeyDown={
+              awaitingStart
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onStartTap();
+                    }
+                  }
+                : undefined
+            }
             style={{
               border: `1.5px solid ${C.gold}`,
               borderRadius: 14,
@@ -3628,15 +3715,23 @@ function ChecklistSection({ C, done, onToggle, onReset }) {
           const isDone = !!done[item.id];
           const cat = CHECK_CATS[item.cat];
           return (
-            <div
+            <button
               key={item.id}
+              type="button"
+              role="checkbox"
+              aria-checked={isDone}
               onClick={() => onToggle(item.id)}
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: 12,
+                width: "100%",
                 padding: "13px 14px",
+                border: "none",
                 borderTop: idx === 0 ? "none" : `1px solid ${C.line}`,
+                borderRadius: 0,
+                font: "inherit",
+                textAlign: "left",
                 cursor: "pointer",
                 background: isDone ? "rgba(63,174,107,0.06)" : "transparent",
               }}
@@ -3686,7 +3781,7 @@ function ChecklistSection({ C, done, onToggle, onReset }) {
               >
                 {cat.label}
               </span>
-            </div>
+            </button>
           );
         })}
       </div>
