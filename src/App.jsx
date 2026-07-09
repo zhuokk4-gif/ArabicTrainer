@@ -1148,13 +1148,23 @@ function transCacheSet(surah, ayah, text) {
 }
 async function fetchAburida(surah, ayah) {
   const url = `https://quranenc.com/api/v1/translation/aya/${TRANS_KEY}/${surah}/${ayah}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  // Antwort ist { result: { translation, ... } } (defensiv beide Formen)
-  const t = (data && data.result && data.result.translation) || (data && data.translation);
-  if (!t) throw new Error("Kein Übersetzungstext in der Antwort");
-  return String(t).replace(/\s+/g, " ").trim();
+  const doFetch = async () => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // Antwort ist { result: { translation, ... } } (defensiv beide Formen)
+    const t = (data && data.result && data.result.translation) || (data && data.translation);
+    if (!t) throw new Error("Kein Übersetzungstext in der Antwort");
+    return String(t).replace(/\s+/g, " ").trim();
+  };
+  try {
+    return await doFetch();
+  } catch (e) {
+    // Ein Retry nach kurzer Pause — federt kurze Netz-/API-Aussetzer ab,
+    // statt sofort "nicht verfügbar" zu zeigen.
+    await new Promise((r) => setTimeout(r, 600));
+    return await doFetch();
+  }
 }
 
 // Faengt Render-Fehler ab, statt die ganze Seite bei fremden Nutzern weiss
@@ -1178,21 +1188,8 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div
-          style={{
-            minHeight: "100vh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 14,
-            padding: 24,
-            textAlign: "center",
-            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
-            background: "#0f1b14",
-            color: "#eaf3ec",
-          }}
-        >
+        <div className="eb-min-h">
+          <style>{`.eb-min-h{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0f1b14;color:#eaf3ec}`}</style>
           <div style={{ fontSize: 17, fontWeight: 700 }}>Etwas ist schiefgelaufen.</div>
           <div style={{ fontSize: 14, opacity: 0.75, maxWidth: 320 }}>
             Bitte die Seite neu laden. Dein gespeicherter Fortschritt (Checkliste, Statistik) bleibt erhalten.
@@ -1770,8 +1767,8 @@ function ArabTrainerApp() {
 
   return (
     <div
+      className="app-shell"
       style={{
-        minHeight: "100vh",
         background: `radial-gradient(120% 90% at 50% -10%, #17301f 0%, ${C.bg} 60%)`,
         color: C.ink,
         fontFamily:
@@ -1781,7 +1778,7 @@ function ArabTrainerApp() {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap');
+        .app-shell { min-height: 100vh; min-height: 100dvh; }
         * { -webkit-tap-highlight-color: transparent; }
         @keyframes pop { 0%{transform:scale(.96);opacity:0} 100%{transform:scale(1);opacity:1} }
         @keyframes flashBox { 0%{background:rgba(217,178,95,.35)} 100%{background:transparent} }
