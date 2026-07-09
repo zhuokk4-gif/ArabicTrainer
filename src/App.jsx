@@ -391,9 +391,125 @@ const MAARIJ_1_44 = tagAyat([
   { ar: "خَاشِعَةً أَبْصَارُهُمْ تَرْهَقُهُمْ ذِلَّةٌ ۚ ذَٰلِكَ الْيَوْمُ الَّذِي كَانُوا يُوعَدُونَ", tr: "khāshiʿatan abṣāruhum tarhaquhum dhillah, dhālika l-yawmu lladhī kānū yūʿadūn"  },
 ], 70, 1);
 
-// 3 Suren am Stueck: aus den oben abgedeckten Ayat zusammengesetzt
-// (al-Mulk 1-11, al-Qalam 1-16, al-Haqqa 1-10 — nicht die vollen Suren).
-const DREI_SUREN = [...MULK_1_5, ...MULK_6_11, ...QALAM_1_16, ...HAQQA_1_10];
+// --- Restliche Ayat fuer das 3er-Paket (komplette Suren) ---
+// Ayah 1-11/1-16/1-10 kommen unveraendert aus den bestehenden Haeppchen
+// oben (MULK_1_5, MULK_6_11, QALAM_1_16, HAQQA_1_10) — hier nur der Rest,
+// gegen alim.org (Uthmani-Text) abgeglichen und im selben Stil normalisiert.
+
+// --- Surat al-Mulk (67), Ayat 12-30 ---
+const MULK_12_30 = tagAyat([
+  { ar: "إِنَّ الَّذِينَ يَخْشَوْنَ رَبَّهُم بِالْغَيْبِ لَهُم مَّغْفِرَةٌ وَأَجْرٌ كَبِيرٌ", tr: "inna lladhīna yakhshawna rabbahum bi-l-ghaybi lahum maghfiratun wa-ajrun kabīr" },
+  { ar: "وَأَسِرُّوا قَوْلَكُمْ أَوِ اجْهَرُوا بِهِ ۖ إِنَّهُ عَلِيمٌ بِذَاتِ الصُّدُورِ", tr: "wa-asirrū qawlakum awi jharū bihi, innahu ʿalīmun bi-dhāti ṣ-ṣudūr" },
+  { ar: "أَلَا يَعْلَمُ مَنْ خَلَقَ وَهُوَ اللَّطِيفُ الْخَبِيرُ", tr: "a-lā yaʿlamu man khalaq, wa-huwa l-laṭīfu l-khabīr" },
+  { ar: "هُوَ الَّذِي جَعَلَ لَكُمُ الْأَرْضَ ذَلُولًا فَامْشُوا فِي مَنَاكِبِهَا وَكُلُوا مِن رِّزْقِهِ ۖ وَإِلَيْهِ النُّشُورُ", tr: "huwa lladhī jaʿala lakumu l-arḍa dhalūlan fa-mshū fī manākibihā wa-kulū min rizqih, wa-ilayhi n-nushūr" },
+  { ar: "أَأَمِنتُم مَّن فِي السَّمَاءِ أَن يَخْسِفَ بِكُمُ الْأَرْضَ فَإِذَا هِيَ تَمُورُ", tr: "a-amintum man fi s-samāʾi an yakhsifa bikumu l-arḍa fa-idhā hiya tamūr" },
+  { ar: "أَمْ أَمِنتُم مَّن فِي السَّمَاءِ أَن يُرْسِلَ عَلَيْكُمْ حَاصِبًا ۖ فَسَتَعْلَمُونَ كَيْفَ نَذِيرِ", tr: "am amintum man fi s-samāʾi an yursila ʿalaykum ḥāṣibā, fa-sa-taʿlamūna kayfa nadhīr" },
+  { ar: "وَلَقَدْ كَذَّبَ الَّذِينَ مِن قَبْلِهِمْ فَكَيْفَ كَانَ نَكِيرِ", tr: "wa-laqad kadhdhaba lladhīna min qablihim fa-kayfa kāna nakīr" },
+  { ar: "أَوَلَمْ يَرَوْا إِلَى الطَّيْرِ فَوْقَهُمْ صَافَّاتٍ وَيَقْبِضْنَ ۚ مَا يُمْسِكُهُنَّ إِلَّا الرَّحْمَٰنُ ۚ إِنَّهُ بِكُلِّ شَيْءٍ بَصِيرٌ", tr: "a-wa-lam yaraw ila ṭ-ṭayri fawqahum ṣāffātin wa-yaqbiḍn, mā yumsikuhunna illā r-raḥmān, innahu bi-kulli shayʾin baṣīr" },
+  { ar: "أَمَّنْ هَٰذَا الَّذِي هُوَ جُندٌ لَّكُمْ يَنصُرُكُم مِّن دُونِ الرَّحْمَٰنِ ۚ إِنِ الْكَافِرُونَ إِلَّا فِي غُرُورٍ", tr: "amman hādhā lladhī huwa jundun lakum yanṣurukum min dūni r-raḥmān, ini l-kāfirūna illā fī ghurūr" },
+  { ar: "أَمَّنْ هَٰذَا الَّذِي يَرْزُقُكُمْ إِنْ أَمْسَكَ رِزْقَهُ ۚ بَل لَّجُّوا فِي عُتُوٍّ وَنُفُورٍ", tr: "amman hādhā lladhī yarzuqukum in amsaka rizqah, bal lajjū fī ʿutuwwin wa-nufūr" },
+  { ar: "أَفَمَن يَمْشِي مُكِبًّا عَلَىٰ وَجْهِهِ أَهْدَىٰ أَمَّن يَمْشِي سَوِيًّا عَلَىٰ صِرَاطٍ مُّسْتَقِيمٍ", tr: "a-fa-man yamshī mukibban ʿalā wajhihī ahdā amman yamshī sawiyyan ʿalā ṣirāṭin mustaqīm" },
+  { ar: "قُلْ هُوَ الَّذِي أَنشَأَكُمْ وَجَعَلَ لَكُمُ السَّمْعَ وَالْأَبْصَارَ وَالْأَفْئِدَةَ ۖ قَلِيلًا مَّا تَشْكُرُونَ", tr: "qul huwa lladhī anshaʾakum wa-jaʿala lakumu s-samʿa wa-l-abṣāra wa-l-afʾidah, qalīlan mā tashkurūn" },
+  { ar: "قُلْ هُوَ الَّذِي ذَرَأَكُمْ فِي الْأَرْضِ وَإِلَيْهِ تُحْشَرُونَ", tr: "qul huwa lladhī dharaʾakum fi l-arḍi wa-ilayhi tuḥsharūn" },
+  { ar: "وَيَقُولُونَ مَتَىٰ هَٰذَا الْوَعْدُ إِن كُنتُمْ صَادِقِينَ", tr: "wa-yaqūlūna matā hādha l-waʿdu in kuntum ṣādiqīn" },
+  { ar: "قُلْ إِنَّمَا الْعِلْمُ عِندَ اللَّهِ وَإِنَّمَا أَنَا نَذِيرٌ مُّبِينٌ", tr: "qul innama l-ʿilmu ʿinda llāh, wa-innamā ana nadhīrun mubīn" },
+  { ar: "فَلَمَّا رَأَوْهُ زُلْفَةً سِيئَتْ وُجُوهُ الَّذِينَ كَفَرُوا وَقِيلَ هَٰذَا الَّذِي كُنتُم بِهِ تَدَّعُونَ", tr: "fa-lammā raʾawhu zulfatan sīʾat wujūhu lladhīna kafarū wa-qīla hādha lladhī kuntum bihī taddaʿūn" },
+  { ar: "قُلْ أَرَأَيْتُمْ إِنْ أَهْلَكَنِيَ اللَّهُ وَمَن مَّعِيَ أَوْ رَحِمَنَا فَمَن يُجِيرُ الْكَافِرِينَ مِنْ عَذَابٍ أَلِيمٍ", tr: "qul araʾaytum in ahlakaniya llāhu wa-man maʿiya aw raḥimanā fa-man yujīru l-kāfirīna min ʿadhābin alīm" },
+  { ar: "قُلْ هُوَ الرَّحْمَٰنُ آمَنَّا بِهِ وَعَلَيْهِ تَوَكَّلْنَا ۖ فَسَتَعْلَمُونَ مَنْ هُوَ فِي ضَلَالٍ مُّبِينٍ", tr: "qul huwa r-raḥmānu āmannā bihi wa-ʿalayhi tawakkalnā, fa-sa-taʿlamūna man huwa fī ḍalālin mubīn" },
+  { ar: "قُلْ أَرَأَيْتُمْ إِنْ أَصْبَحَ مَاؤُكُمْ غَوْرًا فَمَن يَأْتِيكُم بِمَاءٍ مَّعِينٍ", tr: "qul araʾaytum in aṣbaḥa māʾukum ghawran fa-man yaʾtīkum bi-māʾin maʿīn" },
+], 67, 12);
+const MULK_FULL = [...MULK_1_5, ...MULK_6_11, ...MULK_12_30];
+
+// --- Surat al-Qalam (68), Ayat 17-52 ---
+const QALAM_17_52 = tagAyat([
+  { ar: "إِنَّا بَلَوْنَاهُمْ كَمَا بَلَوْنَا أَصْحَابَ الْجَنَّةِ إِذْ أَقْسَمُوا لَيَصْرِمُنَّهَا مُصْبِحِينَ", tr: "innā balawnāhum kamā balawnā aṣḥāba l-jannati idh aqsamū la-yaṣrimunnahā muṣbiḥīn" },
+  { ar: "وَلَا يَسْتَثْنُونَ", tr: "wa-lā yastathnūn" },
+  { ar: "فَطَافَ عَلَيْهَا طَائِفٌ مِّن رَّبِّكَ وَهُمْ نَائِمُونَ", tr: "fa-ṭāfa ʿalayhā ṭāʾifun min rabbika wa-hum nāʾimūn" },
+  { ar: "فَأَصْبَحَتْ كَالصَّرِيمِ", tr: "fa-aṣbaḥat ka-ṣ-ṣarīm" },
+  { ar: "فَتَنَادَوْا مُصْبِحِينَ", tr: "fa-tanādaw muṣbiḥīn" },
+  { ar: "أَنِ اغْدُوا عَلَىٰ حَرْثِكُمْ إِن كُنتُمْ صَارِمِينَ", tr: "ani ghdū ʿalā ḥarthikum in kuntum ṣārimīn" },
+  { ar: "فَانطَلَقُوا وَهُمْ يَتَخَافَتُونَ", tr: "fa-nṭalaqū wa-hum yatakhāfatūn" },
+  { ar: "أَن لَّا يَدْخُلَنَّهَا الْيَوْمَ عَلَيْكُم مِّسْكِينٌ", tr: "an lā yadkhulannahā l-yawma ʿalaykum miskīn" },
+  { ar: "وَغَدَوْا عَلَىٰ حَرْدٍ قَادِرِينَ", tr: "wa-ghadaw ʿalā ḥardin qādirīn" },
+  { ar: "فَلَمَّا رَأَوْهَا قَالُوا إِنَّا لَضَالُّونَ", tr: "fa-lammā raʾawhā qālū innā la-ḍāllūn" },
+  { ar: "بَلْ نَحْنُ مَحْرُومُونَ", tr: "bal naḥnu maḥrūmūn" },
+  { ar: "قَالَ أَوْسَطُهُمْ أَلَمْ أَقُل لَّكُمْ لَوْلَا تُسَبِّحُونَ", tr: "qāla awsaṭuhum a-lam aqul lakum law-lā tusabbiḥūn" },
+  { ar: "قَالُوا سُبْحَانَ رَبِّنَا إِنَّا كُنَّا ظَالِمِينَ", tr: "qālū subḥāna rabbinā innā kunnā ẓālimīn" },
+  { ar: "فَأَقْبَلَ بَعْضُهُمْ عَلَىٰ بَعْضٍ يَتَلَاوَمُونَ", tr: "fa-aqbala baʿḍuhum ʿalā baʿḍin yatalāwamūn" },
+  { ar: "قَالُوا يَا وَيْلَنَا إِنَّا كُنَّا طَاغِينَ", tr: "qālū yā waylanā innā kunnā ṭāghīn" },
+  { ar: "عَسَىٰ رَبُّنَا أَن يُبْدِلَنَا خَيْرًا مِّنْهَا إِنَّا إِلَىٰ رَبِّنَا رَاغِبُونَ", tr: "ʿasā rabbunā an yubdilanā khayran minhā innā ilā rabbinā rāghibūn" },
+  { ar: "كَذَٰلِكَ الْعَذَابُ ۖ وَلَعَذَابُ الْآخِرَةِ أَكْبَرُ ۚ لَوْ كَانُوا يَعْلَمُونَ", tr: "ka-dhālika l-ʿadhāb, wa-la-ʿadhābu l-ākhirati akbar, law kānū yaʿlamūn" },
+  { ar: "إِنَّ لِلْمُتَّقِينَ عِندَ رَبِّهِمْ جَنَّاتِ النَّعِيمِ", tr: "inna li-l-muttaqīna ʿinda rabbihim jannāti n-naʿīm" },
+  { ar: "أَفَنَجْعَلُ الْمُسْلِمِينَ كَالْمُجْرِمِينَ", tr: "a-fa-najʿalu l-muslimīna ka-l-mujrimīn" },
+  { ar: "مَا لَكُمْ كَيْفَ تَحْكُمُونَ", tr: "mā lakum kayfa taḥkumūn" },
+  { ar: "أَمْ لَكُمْ كِتَابٌ فِيهِ تَدْرُسُونَ", tr: "am lakum kitābun fīhi tadrusūn" },
+  { ar: "إِنَّ لَكُمْ فِيهِ لَمَا تَخَيَّرُونَ", tr: "inna lakum fīhi la-mā takhayyarūn" },
+  { ar: "أَمْ لَكُمْ أَيْمَانٌ عَلَيْنَا بَالِغَةٌ إِلَىٰ يَوْمِ الْقِيَامَةِ ۙ إِنَّ لَكُمْ لَمَا تَحْكُمُونَ", tr: "am lakum aymānun ʿalaynā bālighatun ilā yawmi l-qiyāmah, inna lakum la-mā taḥkumūn" },
+  { ar: "سَلْهُمْ أَيُّهُم بِذَٰلِكَ زَعِيمٌ", tr: "salhum ayyuhum bi-dhālika zaʿīm" },
+  { ar: "أَمْ لَهُمْ شُرَكَاءُ فَلْيَأْتُوا بِشُرَكَائِهِمْ إِن كَانُوا صَادِقِينَ", tr: "am lahum shurakāʾu fa-l-yaʾtū bi-shurakāʾihim in kānū ṣādiqīn" },
+  { ar: "يَوْمَ يُكْشَفُ عَن سَاقٍ وَيُدْعَوْنَ إِلَى السُّجُودِ فَلَا يَسْتَطِيعُونَ", tr: "yawma yukshafu ʿan sāqin wa-yudʿawna ila s-sujūdi fa-lā yastaṭīʿūn" },
+  { ar: "خَاشِعَةً أَبْصَارُهُمْ تَرْهَقُهُمْ ذِلَّةٌ ۖ وَقَدْ كَانُوا يُدْعَوْنَ إِلَى السُّجُودِ وَهُمْ سَالِمُونَ", tr: "khāshiʿatan abṣāruhum tarhaquhum dhillah, wa-qad kānū yudʿawna ila s-sujūdi wa-hum sālimūn" },
+  { ar: "فَذَرْنِي وَمَن يُكَذِّبُ بِهَٰذَا الْحَدِيثِ ۖ سَنَسْتَدْرِجُهُم مِّنْ حَيْثُ لَا يَعْلَمُونَ", tr: "fa-dharnī wa-man yukadhdhibu bi-hādha l-ḥadīth, sa-nastadrijuhum min ḥaythu lā yaʿlamūn" },
+  { ar: "وَأُمْلِي لَهُمْ ۚ إِنَّ كَيْدِي مَتِينٌ", tr: "wa-umlī lahum, inna kaydī matīn" },
+  { ar: "أَمْ تَسْأَلُهُمْ أَجْرًا فَهُم مِّن مَّغْرَمٍ مُّثْقَلُونَ", tr: "am tasʾaluhum ajran fa-hum min maghramin muthqalūn" },
+  { ar: "أَمْ عِندَهُمُ الْغَيْبُ فَهُمْ يَكْتُبُونَ", tr: "am ʿindahumu l-ghaybu fa-hum yaktubūn" },
+  { ar: "فَاصْبِرْ لِحُكْمِ رَبِّكَ وَلَا تَكُن كَصَاحِبِ الْحُوتِ إِذْ نَادَىٰ وَهُوَ مَكْظُومٌ", tr: "fa-ṣbir li-ḥukmi rabbika wa-lā takun ka-ṣāḥibi l-ḥūti idh nādā wa-huwa makẓūm" },
+  { ar: "لَّوْلَا أَن تَدَارَكَهُ نِعْمَةٌ مِّن رَّبِّهِ لَنُبِذَ بِالْعَرَاءِ وَهُوَ مَذْمُومٌ", tr: "law-lā an tadārakahu niʿmatun min rabbihī la-nubidha bi-l-ʿarāʾi wa-huwa madhmūm" },
+  { ar: "فَاجْتَبَاهُ رَبُّهُ فَجَعَلَهُ مِنَ الصَّالِحِينَ", tr: "fa-jtabāhu rabbuhu fa-jaʿalahu mina ṣ-ṣāliḥīn" },
+  { ar: "وَإِن يَكَادُ الَّذِينَ كَفَرُوا لَيُزْلِقُونَكَ بِأَبْصَارِهِمْ لَمَّا سَمِعُوا الذِّكْرَ وَيَقُولُونَ إِنَّهُ لَمَجْنُونٌ", tr: "wa-in yakādu lladhīna kafarū la-yuzliqūnaka bi-abṣārihim lammā samiʿu dh-dhikra wa-yaqūlūna innahu la-majnūn" },
+  { ar: "وَمَا هُوَ إِلَّا ذِكْرٌ لِّلْعَالَمِينَ", tr: "wa-mā huwa illā dhikrun li-l-ʿālamīn" },
+], 68, 17);
+const QALAM_FULL = [...QALAM_1_16, ...QALAM_17_52];
+
+// --- Surat al-Haqqa (69), Ayat 11-52 ---
+const HAQQA_11_52 = tagAyat([
+  { ar: "إِنَّا لَمَّا طَغَى الْمَاءُ حَمَلْنَاكُمْ فِي الْجَارِيَةِ", tr: "innā lammā ṭaghā l-māʾu ḥamalnākum fi l-jāriyah" },
+  { ar: "لِنَجْعَلَهَا لَكُمْ تَذْكِرَةً وَتَعِيَهَا أُذُنٌ وَاعِيَةٌ", tr: "li-najʿalahā lakum tadhkiratan wa-taʿiyahā udhunun wāʿiyah" },
+  { ar: "فَإِذَا نُفِخَ فِي الصُّورِ نَفْخَةٌ وَاحِدَةٌ", tr: "fa-idhā nufikha fi ṣ-ṣūri nafkhatun wāḥidah" },
+  { ar: "وَحُمِلَتِ الْأَرْضُ وَالْجِبَالُ فَدُكَّتَا دَكَّةً وَاحِدَةً", tr: "wa-ḥumilati l-arḍu wa-l-jibālu fa-dukkatā dakkatan wāḥidah" },
+  { ar: "فَيَوْمَئِذٍ وَقَعَتِ الْوَاقِعَةُ", tr: "fa-yawmaʾidhin waqaʿati l-wāqiʿah" },
+  { ar: "وَانشَقَّتِ السَّمَاءُ فَهِيَ يَوْمَئِذٍ وَاهِيَةٌ", tr: "wa-nshaqqati s-samāʾu fa-hiya yawmaʾidhin wāhiyah" },
+  { ar: "وَالْمَلَكُ عَلَىٰ أَرْجَائِهَا ۚ وَيَحْمِلُ عَرْشَ رَبِّكَ فَوْقَهُمْ يَوْمَئِذٍ ثَمَانِيَةٌ", tr: "wa-l-malaku ʿalā arjāʾihā, wa-yaḥmilu ʿarsha rabbika fawqahum yawmaʾidhin thamāniyah" },
+  { ar: "يَوْمَئِذٍ تُعْرَضُونَ لَا تَخْفَىٰ مِنكُمْ خَافِيَةٌ", tr: "yawmaʾidhin tuʿraḍūna lā takhfā minkum khāfiyah" },
+  { ar: "فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ فَيَقُولُ هَاؤُمُ اقْرَءُوا كِتَابِيَهْ", tr: "fa-ammā man ūtiya kitābahu bi-yamīnihī fa-yaqūlu hāʾumu qraʾū kitābiyah" },
+  { ar: "إِنِّي ظَنَنتُ أَنِّي مُلَاقٍ حِسَابِيَهْ", tr: "innī ẓanantu annī mulāqin ḥisābiyah" },
+  { ar: "فَهُوَ فِي عِيشَةٍ رَّاضِيَةٍ", tr: "fa-huwa fī ʿīshatin rāḍiyah" },
+  { ar: "فِي جَنَّةٍ عَالِيَةٍ", tr: "fī jannatin ʿāliyah" },
+  { ar: "قُطُوفُهَا دَانِيَةٌ", tr: "quṭūfuhā dāniyah" },
+  { ar: "كُلُوا وَاشْرَبُوا هَنِيئًا بِمَا أَسْلَفْتُمْ فِي الْأَيَّامِ الْخَالِيَةِ", tr: "kulū wa-shrabū hanīʾan bimā aslaftum fi l-ayyāmi l-khāliyah" },
+  { ar: "وَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِشِمَالِهِ فَيَقُولُ يَا لَيْتَنِي لَمْ أُوتَ كِتَابِيَهْ", tr: "wa-ammā man ūtiya kitābahu bi-shimālihī fa-yaqūlu yā laytanī lam ūta kitābiyah" },
+  { ar: "وَلَمْ أَدْرِ مَا حِسَابِيَهْ", tr: "wa-lam adri mā ḥisābiyah" },
+  { ar: "يَا لَيْتَهَا كَانَتِ الْقَاضِيَةَ", tr: "yā laytahā kānati l-qāḍiyah" },
+  { ar: "مَا أَغْنَىٰ عَنِّي مَالِيَهْ", tr: "mā aghnā ʿannī māliyah" },
+  { ar: "هَلَكَ عَنِّي سُلْطَانِيَهْ", tr: "halaka ʿannī sulṭāniyah" },
+  { ar: "خُذُوهُ فَغُلُّوهُ", tr: "khudhūhu fa-ghullūh" },
+  { ar: "ثُمَّ الْجَحِيمَ صَلُّوهُ", tr: "thumma l-jaḥīma ṣallūh" },
+  { ar: "ثُمَّ فِي سِلْسِلَةٍ ذَرْعُهَا سَبْعُونَ ذِرَاعًا فَاسْلُكُوهُ", tr: "thumma fī silsilatin dharʿuhā sabʿūna dhirāʿan fa-slukūh" },
+  { ar: "إِنَّهُ كَانَ لَا يُؤْمِنُ بِاللَّهِ الْعَظِيمِ", tr: "innahu kāna lā yuʾminu billāhi l-ʿaẓīm" },
+  { ar: "وَلَا يَحُضُّ عَلَىٰ طَعَامِ الْمِسْكِينِ", tr: "wa-lā yaḥuḍḍu ʿalā ṭaʿāmi l-miskīn" },
+  { ar: "فَلَيْسَ لَهُ الْيَوْمَ هَاهُنَا حَمِيمٌ", tr: "fa-laysa lahu l-yawma hāhunā ḥamīm" },
+  { ar: "وَلَا طَعَامٌ إِلَّا مِنْ غِسْلِينٍ", tr: "wa-lā ṭaʿāmun illā min ghislīn" },
+  { ar: "لَّا يَأْكُلُهُ إِلَّا الْخَاطِئُونَ", tr: "lā yaʾkuluhū illā l-khāṭiʾūn" },
+  { ar: "فَلَا أُقْسِمُ بِمَا تُبْصِرُونَ", tr: "fa-lā uqsimu bimā tubṣirūn" },
+  { ar: "وَمَا لَا تُبْصِرُونَ", tr: "wa-mā lā tubṣirūn" },
+  { ar: "إِنَّهُ لَقَوْلُ رَسُولٍ كَرِيمٍ", tr: "innahu la-qawlu rasūlin karīm" },
+  { ar: "وَمَا هُوَ بِقَوْلِ شَاعِرٍ ۚ قَلِيلًا مَّا تُؤْمِنُونَ", tr: "wa-mā huwa bi-qawli shāʿir, qalīlan mā tuʾminūn" },
+  { ar: "وَلَا بِقَوْلِ كَاهِنٍ ۚ قَلِيلًا مَّا تَذَكَّرُونَ", tr: "wa-lā bi-qawli kāhin, qalīlan mā tadhakkarūn" },
+  { ar: "تَنزِيلٌ مِّن رَّبِّ الْعَالَمِينَ", tr: "tanzīlun min rabbi l-ʿālamīn" },
+  { ar: "وَلَوْ تَقَوَّلَ عَلَيْنَا بَعْضَ الْأَقَاوِيلِ", tr: "wa-law taqawwala ʿalaynā baʿḍa l-aqāwīl" },
+  { ar: "لَأَخَذْنَا مِنْهُ بِالْيَمِينِ", tr: "la-akhadhnā minhu bi-l-yamīn" },
+  { ar: "ثُمَّ لَقَطَعْنَا مِنْهُ الْوَتِينَ", tr: "thumma la-qaṭaʿnā minhu l-watīn" },
+  { ar: "فَمَا مِنكُم مِّنْ أَحَدٍ عَنْهُ حَاجِزِينَ", tr: "fa-mā minkum min aḥadin ʿanhu ḥājizīn" },
+  { ar: "وَإِنَّهُ لَتَذْكِرَةٌ لِّلْمُتَّقِينَ", tr: "wa-innahu la-tadhkiratun li-l-muttaqīn" },
+  { ar: "وَإِنَّا لَنَعْلَمُ أَنَّ مِنكُم مُّكَذِّبِينَ", tr: "wa-innā la-naʿlamu anna minkum mukadhdhibīn" },
+  { ar: "وَإِنَّهُ لَحَسْرَةٌ عَلَى الْكَافِرِينَ", tr: "wa-innahu la-ḥasratun ʿala l-kāfirīn" },
+  { ar: "وَإِنَّهُ لَحَقُّ الْيَقِينِ", tr: "wa-innahu la-ḥaqqu l-yaqīn" },
+  { ar: "فَسَبِّحْ بِاسْمِ رَبِّكَ الْعَظِيمِ", tr: "fa-sabbiḥ bi-smi rabbika l-ʿaẓīm" },
+], 69, 11);
+const HAQQA_FULL = [...HAQQA_1_10, ...HAQQA_11_52];
+
+// 3 Suren am Stueck, jetzt komplett (al-Mulk 30, al-Qalam 52, al-Haqqa 52 Ayat).
+const DREI_SUREN = [...MULK_FULL, ...QALAM_FULL, ...HAQQA_FULL];
 
 const QURAN_NOTE = "Text vor dem Lernen mit einem zuverlässigen Mushaf abgleichen.";
 
@@ -610,7 +726,7 @@ const READING_MODULES = {
       { id: "qalam116", label: "al-Qalam — Ayah 1–16", items: QALAM_1_16, note: QURAN_NOTE },
       { id: "haqqa110", label: "al-Haqqa — Ayah 1–10", items: HAQQA_1_10, note: QURAN_NOTE },
       { id: "maarij", label: "al-Maʿārij — komplett (1–44)", items: MAARIJ_1_44, note: QURAN_NOTE },
-      { id: "drei", label: "3 Suren am Stück (abgedeckte Ayat)", items: DREI_SUREN, note: QURAN_NOTE },
+      { id: "drei", label: "3 Suren am Stück — komplett (Mulk, Qalam, Haqqa)", items: DREI_SUREN, note: QURAN_NOTE },
     ],
   },
 };
@@ -1061,6 +1177,10 @@ export default function App() {
   // durch, der aktuelle Vers wird hervorgehoben, danach schaltet es weiter.
   const [followMode, setFollowMode] = useState(false);
   const [followPaused, setFollowPaused] = useState(false);
+  // Beim allerersten Vers eines Durchgangs (Isti'adha/Basmala-Karte) startet
+  // der Rezitator in der Leseverfolgung nicht von selbst, sondern erst wenn
+  // auf die Karte oder den Lautsprecher getippt wird.
+  const [awaitingTapToStart, setAwaitingTapToStart] = useState(false);
 
   const curMod = getModule(moduleId);
   const isReading = curMod.kind === "reading";
@@ -1310,6 +1430,12 @@ export default function App() {
       stopAudio();
       return;
     }
+    // Erster Vers (Isti'adha/Basmala-Karte): noch nicht von selbst starten,
+    // sondern warten, bis auf Karte oder Lautsprecher getippt wurde.
+    if (rIdx === 0 && awaitingTapToStart) {
+      stopAudio();
+      return;
+    }
     const audio = audioElRef.current;
     const item = rQueue[rIdx];
     if (!audio || !item) return;
@@ -1349,7 +1475,7 @@ export default function App() {
     };
     // playReadingAudio je Render neu erzeugt -> bewusst nicht in den Deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen, isReading, followMode, followPaused, rIdx, rQueue]);
+  }, [screen, isReading, followMode, followPaused, rIdx, rQueue, awaitingTapToStart]);
 
   // Tempo-Aenderung sofort auf ein evtl. laufendes Audio anwenden.
   useEffect(() => {
@@ -1393,6 +1519,7 @@ export default function App() {
       setRIdx(0);
       setRevealed(false);
       setFollowPaused(false);
+      setAwaitingTapToStart(true);
       setScreen("play");
     } else if (isPronun) {
       // Aussprache-Check verwaltet Index/Aufloesen im eigenen Screen.
@@ -1561,6 +1688,7 @@ export default function App() {
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap');
         * { -webkit-tap-highlight-color: transparent; }
         @keyframes pop { 0%{transform:scale(.96);opacity:0} 100%{transform:scale(1);opacity:1} }
+        @keyframes flashBox { 0%{background:rgba(217,178,95,.35)} 100%{background:transparent} }
         .opt:focus-visible { outline: 3px solid ${C.gold}; outline-offset: 2px; }
         button:focus-visible { outline: 3px solid ${C.gold}; outline-offset: 2px; }
         @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
@@ -1678,7 +1806,13 @@ export default function App() {
             revealed={revealed}
             onReveal={() => setRevealed(true)}
             onRate={readingRate}
-            onSpeak={() => playReadingAudio(rItem)}
+            onSpeak={() => {
+              if (followMode && rIdx === 0 && awaitingTapToStart) {
+                setAwaitingTapToStart(false);
+              } else {
+                playReadingAudio(rItem);
+              }
+            }}
             onFinish={finish}
             correct={correct}
             wrong={wrong}
@@ -1686,6 +1820,8 @@ export default function App() {
             follow={followMode}
             paused={followPaused}
             onTogglePause={() => setFollowPaused((v) => !v)}
+            awaitingStart={followMode && rIdx === 0 && awaitingTapToStart}
+            onStartTap={() => setAwaitingTapToStart(false)}
           />
         )}
 
@@ -2426,7 +2562,7 @@ function PlayScreen({
 function ReadingScreen({
   C, fontStack, item, note, pos, total, revealed,
   onReveal, onRate, onSpeak, onFinish, correct, wrong, streak,
-  follow, paused, onTogglePause,
+  follow, paused, onTogglePause, awaitingStart, onStartTap,
 }) {
   const stat = (label, val, color) => (
     <div style={{ textAlign: "center" }}>
@@ -2545,21 +2681,29 @@ function ReadingScreen({
           </button>
         </div>
 
-        {pos === 1 && (
+        {(pos === 1 || (isAyah && item.ayah === 1)) && (
           <div
+            onClick={awaitingStart ? onStartTap : undefined}
             style={{
-              borderBottom: `1px solid ${C.line}`,
+              border: `1.5px solid ${C.gold}`,
+              borderRadius: 14,
               marginBottom: 14,
-              paddingBottom: 12,
+              padding: "12px 10px",
               textAlign: "center",
+              animation: "flashBox 1.4s ease-out",
+              cursor: awaitingStart ? "pointer" : "default",
             }}
           >
-            <div style={{ fontFamily: fontStack, direction: "rtl", fontSize: 22, color: C.sub, marginBottom: 2 }}>
-              {OPENING_FORMULA.isti.ar}
-            </div>
-            <div style={{ fontSize: 11.5, color: C.sub, marginBottom: isAyah && item.ayah === 1 ? 10 : 0 }}>
-              {OPENING_FORMULA.isti.tr}
-            </div>
+            {pos === 1 && (
+              <>
+                <div style={{ fontFamily: fontStack, direction: "rtl", fontSize: 22, color: C.sub, marginBottom: 2 }}>
+                  {OPENING_FORMULA.isti.ar}
+                </div>
+                <div style={{ fontSize: 11.5, color: C.sub, marginBottom: isAyah && item.ayah === 1 ? 10 : 0 }}>
+                  {OPENING_FORMULA.isti.tr}
+                </div>
+              </>
+            )}
             {isAyah && item.ayah === 1 && (
               <>
                 <div style={{ fontFamily: fontStack, direction: "rtl", fontSize: 22, color: C.sub, marginBottom: 2 }}>
@@ -2568,8 +2712,14 @@ function ReadingScreen({
                 <div style={{ fontSize: 11.5, color: C.sub }}>{OPENING_FORMULA.basmala.tr}</div>
               </>
             )}
+            {awaitingStart && (
+              <div style={{ fontSize: 11.5, color: C.gold, marginTop: 8, fontWeight: 600 }}>
+                ▶ Zum Start antippen
+              </div>
+            )}
           </div>
         )}
+
 
         {note && (
           <div style={{ color: C.sub, fontSize: 11.5, marginBottom: 10, lineHeight: 1.4 }}>
