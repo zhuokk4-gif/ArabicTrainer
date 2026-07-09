@@ -37,6 +37,10 @@ const RECITERS = [
 function pad3(n) {
   return String(n).padStart(3, "0");
 }
+// Westliche Ziffern -> arabisch-indische Ziffern (٠١٢٣٤٥٦٧٨٩), wie im Mushaf.
+function toArabicIndic(n) {
+  return String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[+d]);
+}
 function ayahAudioUrl(folder, surah, ayah) {
   return `https://everyayah.com/data/${folder}/${pad3(surah)}${pad3(ayah)}.mp3`;
 }
@@ -162,6 +166,41 @@ const POS_LABEL = {
   medial: "in der Mitte",
   final: "am Ende",
 };
+
+const ALL_POS = ["isolated", "initial", "medial", "final"];
+
+// Schnelle Nachschlagetabelle: Buchstaben-Key -> Buchstabenobjekt (aus LETTERS).
+const LETTER_BY_KEY = Object.fromEntries(LETTERS.map((l) => [l.key, l]));
+
+// ---- Daten fuer das Modul "Aehnliche Buchstaben" ----
+// Jede Gruppe buendelt Buchstaben, die dasselbe Grundgeruest (Rasm) teilen
+// und sich nur durch die Punkte (Iʿǧam) unterscheiden — also genau die
+// Buchstaben, die man beim Lesen leicht verwechselt.
+//
+// Optionales Feld `positions`: schraenkt die Gruppe auf bestimmte
+// Positionsformen ein. Fehlt es, gelten ALLE Positionen, die der jeweilige
+// Buchstabe ueberhaupt besitzt (nicht-verbindende Buchstaben haben z.B. nur
+// isoliert/final). Der Fragen-Generator schneidet die erlaubten Positionen
+// mit den tatsaechlich vorhandenen Formen des Zielbuchstabens.
+//
+// Arabisch geprueft: gleiches Geruest, Unterschied nur ueber Punkte.
+const SIMILAR_GROUPS = [
+  // Verbundene "Zahnbuchstaben": am Anfang/in der Mitte haben alle fuenf das
+  // identische Zahn-Geruest und unterscheiden sich nur durch die Punkte.
+  // Isoliert/final laufen sie auseinander (Nūn tiefe Wanne, Yāʾ mit Schwanz)
+  // -> darum bewusst auf initial/medial beschraenkt.
+  { id: "zahn", label: "Zahnbuchstaben (verbunden)", letters: ["ba", "ta", "tha", "nun", "ya"], positions: ["initial", "medial"] },
+  // ب ت ث in allen Positionen: gleiche flache Wanne, nur Punkte anders.
+  { id: "batatha", label: "Bāʾ · Tāʾ · Thāʾ", letters: ["ba", "ta", "tha"] },
+  { id: "jimhakha", label: "Ǧīm · Ḥāʾ · Ḫāʾ", letters: ["jim", "hah", "kha"] },
+  { id: "daldhal", label: "Dāl · Ḏāl", letters: ["dal", "dhal"] },
+  { id: "razay", label: "Rāʾ · Zāy", letters: ["ra", "zay"] },
+  { id: "sinshin", label: "Sīn · Šīn", letters: ["sin", "shin"] },
+  { id: "saddad", label: "Ṣād · Ḍād", letters: ["sad", "dad"] },
+  { id: "tahzah", label: "Ṭāʾ · Ẓāʾ", letters: ["tah", "zah"] },
+  { id: "ainghain", label: "ʿAin · Ġain", letters: ["ain", "ghain"] },
+  { id: "faqaf", label: "Fāʾ · Qāf", letters: ["fa", "qaf"] },
+];
 
 // ---- Daten fuer das Harakat-Modul ----
 // Saubere Kurz-Transliteration je Konsonant (fuer die Lese-Optionen).
@@ -441,6 +480,41 @@ function makeHarakatQuestion(mode) {
   };
 }
 
+// Aehnliche Buchstaben: ein Buchstabe wird in einer Positionsform gezeigt,
+// zur Auswahl stehen NUR die verwechselbaren Geschwister derselben Gruppe.
+// Der Lerneffekt liegt also im Unterscheiden ueber die Punkte.
+function makeSimilarQuestion() {
+  const group = randOf(SIMILAR_GROUPS);
+  const members = group.letters.map((k) => LETTER_BY_KEY[k]);
+  const target = randOf(members);
+
+  // Erlaubte Positionen der Gruppe (falls gesetzt) mit den Formen schneiden,
+  // die dieser Buchstabe wirklich hat (nicht-verbindende: nur isoliert/final).
+  const allowed = group.positions || ALL_POS;
+  const available = allowed.filter((p) => target.forms[p]);
+  // Verbundene Formen sind lehrreicher; die isolierte Form nur nehmen, wenn es
+  // keine andere Position gibt (z.B. koennte eine Gruppe rein isoliert sein).
+  const connected = available.filter((p) => p !== "isolated");
+  const pos = randOf(connected.length ? connected : available);
+
+  const options = shuffle(
+    members.map((l) => ({
+      label: l.forms.isolated,
+      correct: l.key === target.key,
+      arabic: true,
+    }))
+  );
+  return {
+    audio: false,
+    speakText: target.base,
+    badge: `Position: ${POS_LABEL[pos]}`,
+    prompt: target.forms[pos],
+    promptArabic: true,
+    questionText: "Welcher Buchstabe ist das? Achte auf die Punkte.",
+    options,
+  };
+}
+
 // ============================================================
 //  Modul-Registry
 // ============================================================
@@ -454,6 +528,16 @@ const CHOICE_MODULES = {
     modes: [
       { id: "form2letter", audio: false, label: "Form → Buchstabe", sub: "Eine Positionsform wird gezeigt, du wählst den Grundbuchstaben." },
       { id: "sound2form", audio: true, label: "Laut → Form", sub: "Der Buchstabe wird vorgelesen, du wählst die richtige Form." },
+    ],
+  },
+  similar: {
+    id: "similar",
+    kind: "choice",
+    title: "Ähnliche Buchstaben",
+    subtitle: "Verwechselbare Buchstaben an den Punkten unterscheiden",
+    make: makeSimilarQuestion,
+    modes: [
+      { id: "which", audio: false, label: "Form → Buchstabe", sub: "Ein ähnlich aussehender Buchstabe wird gezeigt, du erkennst ihn an Anzahl und Lage der Punkte." },
     ],
   },
   harakat: {
@@ -486,7 +570,7 @@ const READING_MODULES = {
   },
 };
 
-const MODULE_ORDER = ["letters", "harakat", "words", "ayat", "lesehilfen"];
+const MODULE_ORDER = ["letters", "similar", "harakat", "words", "ayat", "lesehilfen"];
 
 // ============================================================
 //  Wörter lesen (Aussprache-Check-Ablauf)
@@ -997,6 +1081,9 @@ export default function App() {
   const [reciterId, setReciterId] = useState(RECITERS[0].id);
   const reciterFolder = (RECITERS.find((r) => r.id === reciterId) || RECITERS[0]).folder;
   const audioElRef = useRef(typeof window !== "undefined" ? new Audio() : null);
+  // Wiedergabetempo der Rezitation (1 = Originaltempo). Tonhoehe bleibt via
+  // preservesPitch erhalten, damit Langsamer-Stellen nicht brummt.
+  const [rate, setRate] = useState(1);
 
   // Timer fuer den Auto-Modus (Aufdecken + Pause bis zur naechsten Frage)
   const autoRevealTimerRef = useRef(null);
@@ -1069,6 +1156,10 @@ export default function App() {
     if (src && audio) {
       audio.pause();
       audio.onerror = () => speak(fallbackText);
+      // Tonhoehe halten (Safari braucht das Praefix), dann Tempo setzen.
+      audio.preservesPitch = true;
+      audio.webkitPreservesPitch = true;
+      audio.playbackRate = rate;
       audio.src = src;
       const p = audio.play();
       if (p && p.catch) p.catch(() => speak(fallbackText));
@@ -1106,6 +1197,9 @@ export default function App() {
     if (!audio) return;
     audio.pause();
     audio.onerror = () => {};
+    audio.preservesPitch = true;
+    audio.webkitPreservesPitch = true;
+    audio.playbackRate = rate;
     audio.src = ayahAudioUrl(reciterFolder, 1, 1);
     audio.play().catch(() => {});
   }
@@ -1382,6 +1476,8 @@ export default function App() {
             reciterId={reciterId}
             setReciterId={setReciterId}
             onTestReciter={testReciter}
+            rate={rate}
+            setRate={setRate}
             onStart={startGame}
             curStat={curStat}
             statLabel={statLabel}
@@ -1536,7 +1632,7 @@ function StartScreen({
   C, moduleId, onSelectModule, curMod, isReading,
   mode, setMode, packId, setPackId,
   needsVoice, voices, voiceURI, setVoiceURI, onPreviewVoice,
-  needsReciter, reciterId, setReciterId, onTestReciter,
+  needsReciter, reciterId, setReciterId, onTestReciter, rate, setRate,
   onStart, curStat, statLabel, onResetStats,
   autoMode, setAutoMode, autoRevealSec, setAutoRevealSec, autoPauseSec, setAutoPauseSec,
   showStats,
@@ -1733,6 +1829,31 @@ function StartScreen({
               </button>
             ))}
           </div>
+
+          <div style={{ fontSize: 13, color: C.sub, marginBottom: 8, fontWeight: 600 }}>
+            TEMPO
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            {[0.5, 0.75, 1, 1.25].map((r) => (
+              <button
+                key={r}
+                onClick={() => setRate(r)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 10,
+                  border: `1.5px solid ${rate === r ? C.gold : C.line}`,
+                  background: rate === r ? "rgba(217,178,95,.15)" : C.panel2,
+                  color: rate === r ? C.gold : C.ink,
+                  cursor: "pointer",
+                  fontSize: 14,
+                  fontWeight: 700,
+                }}
+              >
+                {r === 1 ? "1×" : `${r}×`}
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={onTestReciter}
             style={{
@@ -2255,7 +2376,32 @@ function ReadingScreen({
             padding: "6px 2px",
           }}
         >
-          {item.ar}
+          <span style={{ direction: "rtl" }}>
+            {item.ar}
+            {isAyah && (
+              <span
+                title={`Ayah ${item.ayah}`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "1.7em",
+                  height: "1.7em",
+                  padding: "0 0.3em",
+                  margin: "0 0.28em",
+                  fontSize: "0.42em",
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  border: `1.5px solid ${C.gold}`,
+                  borderRadius: 999,
+                  color: C.gold,
+                  verticalAlign: "middle",
+                }}
+              >
+                {toArabicIndic(item.ayah)}
+              </span>
+            )}
+          </span>
         </div>
 
         {!revealed ? (
