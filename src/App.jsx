@@ -1252,6 +1252,7 @@ function ArabTrainerApp() {
   // unten soll dann nicht nochmal von vorn abspielen, nur die Listener
   // fuers Weiterschalten anhaengen.
   const skipNextAutoPlayRef = useRef(false);
+  const preloadedUrlRef = useRef(null);
 
   const curMod = getModule(moduleId);
   const isReading = curMod.kind === "reading";
@@ -1537,6 +1538,19 @@ function ArabTrainerApp() {
     const audio = audioElRef.current;
     const item = rQueue[rIdx];
     if (!audio || !item) return;
+
+    // Naechsten Vers im Hintergrund vorladen — sonst haengt der Uebergang
+    // an der Netzwerk-Ladezeit der naechsten Datei ("abbrechen" zw. Ayat).
+    const nextItem = rQueue[rIdx + 1];
+    if (nextItem && nextItem.surah && nextItem.ayah) {
+      const nextUrl = ayahAudioUrl(reciterFolder, nextItem.surah, nextItem.ayah);
+      if (preloadedUrlRef.current !== nextUrl) {
+        preloadedUrlRef.current = nextUrl;
+        const pre = new Audio();
+        pre.preload = "auto";
+        pre.src = nextUrl;
+      }
+    }
 
     let done = false;
     let safety = null;
