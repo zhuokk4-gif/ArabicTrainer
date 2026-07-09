@@ -1012,6 +1012,11 @@ export default function App() {
   const [autoRevealSec, setAutoRevealSec] = useState(3); // 1..8
   const [autoPauseSec, setAutoPauseSec] = useState(1); // 0.5..3
 
+  // Leseverfolgung (nur Lese-Module): Ayat laufen in Reihenfolge automatisch
+  // durch, der aktuelle Vers wird hervorgehoben, danach schaltet es weiter.
+  const [followMode, setFollowMode] = useState(false);
+  const [followPaused, setFollowPaused] = useState(false);
+
   const curMod = getModule(moduleId);
   const isReading = curMod.kind === "reading";
   const isChoice = curMod.kind === "choice";
@@ -1156,11 +1161,18 @@ export default function App() {
     if (src && audio) {
       audio.pause();
       audio.onerror = () => speak(fallbackText);
-      // Tonhoehe halten (Safari braucht das Praefix), dann Tempo setzen.
-      audio.preservesPitch = true;
-      audio.webkitPreservesPitch = true;
-      audio.playbackRate = rate;
       audio.src = src;
+      // Tempo/Tonhoehe ERST nach dem src-Wechsel setzen — ein Ladevorgang
+      // setzt playbackRate sonst wieder auf 1 zurueck. Zur Sicherheit erneut,
+      // sobald die Metadaten geladen sind.
+      const applyRate = () => {
+        audio.preservesPitch = true;
+        audio.webkitPreservesPitch = true;
+        audio.defaultPlaybackRate = rate;
+        audio.playbackRate = rate;
+      };
+      applyRate();
+      audio.addEventListener("loadedmetadata", applyRate, { once: true });
       const p = audio.play();
       if (p && p.catch) p.catch(() => speak(fallbackText));
     } else {
@@ -1197,10 +1209,15 @@ export default function App() {
     if (!audio) return;
     audio.pause();
     audio.onerror = () => {};
-    audio.preservesPitch = true;
-    audio.webkitPreservesPitch = true;
-    audio.playbackRate = rate;
     audio.src = ayahAudioUrl(reciterFolder, 1, 1);
+    const applyRate = () => {
+      audio.preservesPitch = true;
+      audio.webkitPreservesPitch = true;
+      audio.defaultPlaybackRate = rate;
+      audio.playbackRate = rate;
+    };
+    applyRate();
+    audio.addEventListener("loadedmetadata", applyRate, { once: true });
     audio.play().catch(() => {});
   }
 
@@ -1238,6 +1255,68 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen, isReading, autoMode, q, locked, autoPauseSec]);
 
+  // ---- Leseverfolgung: aktuellen Vers abspielen, danach zum naechsten ----
+  // Ayah-Ebene: eine Datei je Vers -> das 'ended'-Ereignis ist das saubere
+  // Signal zum Weiterschalten. Als Sicherheitsnetz (Offline/TTS-Fallback, wo
+  // kein 'ended' kommt) ein an der Vers-Dauer orientierter Timer.
+  useEffect(() => {
+    if (screen !== "play" || !isReading || !followMode) return;
+    if (followPaused) {
+      stopAudio();
+      return;
+    }
+    const audio = audioElRef.current;
+    const item = rQueue[rIdx];
+    if (!audio || !item) return;
+
+    let done = false;
+    let safety = null;
+
+    const advance = () => {
+      if (done) return;
+      done = true;
+      const next = rIdx + 1;
+      if (next >= rQueue.length) {
+        stopAudio();
+        setScreen("start"); // Durchlauf zu Ende -> zurueck zur Auswahl
+      } else {
+        setRIdx(next);
+      }
+    };
+
+    const onEnded = () => advance();
+    const onMeta = () => {
+      if (safety) clearTimeout(safety);
+      const ms = (audio.duration / (rate || 1)) * 1000 + 2500;
+      safety = setTimeout(advance, isFinite(ms) && ms > 0 ? ms : 30000);
+    };
+
+    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("loadedmetadata", onMeta);
+    safety = setTimeout(advance, 30000); // grober Deckel bis Metadaten da sind
+
+    playReadingAudio(item);
+
+    return () => {
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("loadedmetadata", onMeta);
+      if (safety) clearTimeout(safety);
+    };
+    // playReadingAudio je Render neu erzeugt -> bewusst nicht in den Deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, isReading, followMode, followPaused, rIdx, rQueue]);
+
+  // Tempo-Aenderung sofort auf ein evtl. laufendes Audio anwenden.
+  useEffect(() => {
+    const a = audioElRef.current;
+    if (a) {
+      a.preservesPitch = true;
+      a.webkitPreservesPitch = true;
+      a.defaultPlaybackRate = rate;
+      a.playbackRate = rate;
+    }
+  }, [rate]);
+
   function selectModule(id) {
     const m = getModule(id);
     setModuleId(id);
@@ -1263,9 +1342,12 @@ export default function App() {
 
     if (isReading) {
       const pack = curMod.packs.find((p) => p.id === packId) || curMod.packs[0];
-      setRQueue(shuffle(pack.items));
+      // Verse immer in Reihenfolge (1,2,3,…) — beim Lesen einer Sure sinnvoll,
+      // und Voraussetzung fuer die Leseverfolgung.
+      setRQueue(pack.items.slice());
       setRIdx(0);
       setRevealed(false);
+      setFollowPaused(false);
       setScreen("play");
     } else if (isPronun) {
       // Aussprache-Check verwaltet Index/Aufloesen im eigenen Screen.
@@ -1352,6 +1434,11 @@ export default function App() {
     stopAudio();
     // Auto-Modus: nichts gezaehlt -> kein Ergebnis-Screen, zurueck zum Start.
     if (autoMode && !isReading) {
+      setScreen("start");
+      return;
+    }
+    // Leseverfolgung: reines Zuhoeren, keine Wertung -> zurueck zur Auswahl.
+    if (followMode && isReading) {
       setScreen("start");
       return;
     }
@@ -1478,6 +1565,8 @@ export default function App() {
             onTestReciter={testReciter}
             rate={rate}
             setRate={setRate}
+            followMode={followMode}
+            setFollowMode={setFollowMode}
             onStart={startGame}
             curStat={curStat}
             statLabel={statLabel}
@@ -1549,6 +1638,9 @@ export default function App() {
             correct={correct}
             wrong={wrong}
             streak={streak}
+            follow={followMode}
+            paused={followPaused}
+            onTogglePause={() => setFollowPaused((v) => !v)}
           />
         )}
 
@@ -1633,6 +1725,7 @@ function StartScreen({
   mode, setMode, packId, setPackId,
   needsVoice, voices, voiceURI, setVoiceURI, onPreviewVoice,
   needsReciter, reciterId, setReciterId, onTestReciter, rate, setRate,
+  followMode, setFollowMode,
   onStart, curStat, statLabel, onResetStats,
   autoMode, setAutoMode, autoRevealSec, setAutoRevealSec, autoPauseSec, setAutoPauseSec,
   showStats,
@@ -1852,6 +1945,54 @@ function StartScreen({
                 {r === 1 ? "1×" : `${r}×`}
               </button>
             ))}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 12,
+              padding: "10px 0 12px",
+              borderTop: `1px solid ${C.line}`,
+              marginBottom: 12,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 13, color: C.sub, fontWeight: 600 }}>LESEVERFOLGUNG</div>
+              <div style={{ fontSize: 12.5, color: C.sub, marginTop: 3, lineHeight: 1.4 }}>
+                Die Ayat laufen der Reihe nach automatisch durch, der aktuelle Vers
+                wird hervorgehoben. Zuhören statt abfragen — keine Statistik.
+              </div>
+            </div>
+            <button
+              onClick={() => setFollowMode((v) => !v)}
+              aria-label="Leseverfolgung umschalten"
+              style={{
+                flexShrink: 0,
+                width: 54,
+                height: 30,
+                borderRadius: 999,
+                border: `1px solid ${followMode ? C.green : C.line}`,
+                background: followMode ? "rgba(63,174,107,0.25)" : C.panel2,
+                position: "relative",
+                cursor: "pointer",
+                transition: "all .15s",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: 3,
+                  left: followMode ? 27 : 3,
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: followMode ? C.green : C.sub,
+                  transition: "all .15s",
+                }}
+              />
+            </button>
           </div>
 
           <button
@@ -2240,6 +2381,7 @@ function PlayScreen({
 function ReadingScreen({
   C, fontStack, item, note, pos, total, revealed,
   onReveal, onRate, onSpeak, onFinish, correct, wrong, streak,
+  follow, paused, onTogglePause,
 }) {
   const stat = (label, val, color) => (
     <div style={{ textAlign: "center" }}>
@@ -2288,33 +2430,37 @@ function ReadingScreen({
 
   return (
     <div>
-      {/* Statuszeile */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          alignItems: "center",
-          background: C.panel,
-          border: `1px solid ${C.line}`,
-          borderRadius: 14,
-          padding: "12px 8px",
-          marginBottom: 16,
-        }}
-      >
-        {stat("Richtig", correct, C.green)}
-        {stat("Falsch", wrong, C.red)}
-        {stat("Serie", streak, C.gold)}
-      </div>
+      {/* Statuszeile (nur im Abfrage-Modus, nicht bei der Leseverfolgung) */}
+      {!follow && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+            background: C.panel,
+            border: `1px solid ${C.line}`,
+            borderRadius: 14,
+            padding: "12px 8px",
+            marginBottom: 16,
+          }}
+        >
+          {stat("Richtig", correct, C.green)}
+          {stat("Falsch", wrong, C.red)}
+          {stat("Serie", streak, C.gold)}
+        </div>
+      )}
 
       {/* Karte */}
       <div
         style={{
           background: C.panel,
-          border: `1px solid ${C.line}`,
+          border: `1px solid ${follow && !paused ? C.gold : C.line}`,
+          boxShadow: follow && !paused ? `0 0 0 2px rgba(217,178,95,.25)` : "none",
           borderRadius: 18,
           padding: "20px 18px 24px",
           textAlign: "center",
           marginBottom: 16,
+          transition: "box-shadow .2s, border-color .2s",
         }}
       >
         <div
@@ -2404,7 +2550,7 @@ function ReadingScreen({
           </span>
         </div>
 
-        {!revealed ? (
+        {!(follow || revealed) ? (
           <div style={{ color: C.sub, fontSize: 14, marginTop: 6 }}>
             Laut lesen, dann auflösen.
           </div>
@@ -2430,7 +2576,25 @@ function ReadingScreen({
       </div>
 
       {/* Aktionen */}
-      {!revealed ? (
+      {follow ? (
+        <button
+          onClick={onTogglePause}
+          style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: 14,
+            border: `1.5px solid ${C.gold}`,
+            background: paused ? `linear-gradient(180deg, ${C.green}, ${C.greenD})` : "transparent",
+            color: paused ? "#fff" : C.gold,
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: "pointer",
+            marginBottom: 12,
+          }}
+        >
+          {paused ? "▶ Weiter" : "⏸ Pause"}
+        </button>
+      ) : !revealed ? (
         <button
           onClick={onReveal}
           style={{
