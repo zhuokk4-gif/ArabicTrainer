@@ -1247,6 +1247,11 @@ function ArabTrainerApp() {
   // der Rezitator in der Leseverfolgung nicht von selbst, sondern erst wenn
   // auf die Karte oder den Lautsprecher getippt wird.
   const [awaitingTapToStart, setAwaitingTapToStart] = useState(false);
+  // Wird von onSpeak/onStartTap gesetzt, wenn der Tap selbst schon direkt
+  // (synchron, wegen iOS-Autoplay-Regel) den Ton gestartet hat — der Effekt
+  // unten soll dann nicht nochmal von vorn abspielen, nur die Listener
+  // fuers Weiterschalten anhaengen.
+  const skipNextAutoPlayRef = useRef(false);
 
   const curMod = getModule(moduleId);
   const isReading = curMod.kind === "reading";
@@ -1559,7 +1564,13 @@ function ArabTrainerApp() {
     audio.addEventListener("loadedmetadata", onMeta);
     safety = setTimeout(advance, 30000); // grober Deckel bis Metadaten da sind
 
-    playReadingAudio(item);
+    if (skipNextAutoPlayRef.current) {
+      // Wurde gerade schon synchron im Tap gestartet (siehe onSpeak/onStartTap) —
+      // nicht nochmal abspielen, nur Listener oben zaehlen.
+      skipNextAutoPlayRef.current = false;
+    } else {
+      playReadingAudio(item);
+    }
 
     return () => {
       audio.removeEventListener("ended", onEnded);
@@ -1901,6 +1912,8 @@ function ArabTrainerApp() {
             onRate={readingRate}
             onSpeak={() => {
               if (followMode && rIdx === 0 && awaitingTapToStart) {
+                skipNextAutoPlayRef.current = true;
+                playReadingAudio(rItem); // synchron im Tap -> iOS erlaubt Ton
                 setAwaitingTapToStart(false);
               } else {
                 playReadingAudio(rItem);
@@ -1914,7 +1927,11 @@ function ArabTrainerApp() {
             paused={followPaused}
             onTogglePause={() => setFollowPaused((v) => !v)}
             awaitingStart={followMode && rIdx === 0 && awaitingTapToStart}
-            onStartTap={() => setAwaitingTapToStart(false)}
+            onStartTap={() => {
+              skipNextAutoPlayRef.current = true;
+              playReadingAudio(rItem); // synchron im Tap -> iOS erlaubt Ton
+              setAwaitingTapToStart(false);
+            }}
             playing={audioPlaying}
           />
         )}
