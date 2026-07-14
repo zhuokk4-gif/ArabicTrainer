@@ -1967,7 +1967,242 @@ function ArabTrainerApp() {
           <ChecklistSection C={C} done={checklistDone} onToggle={toggleCheck} onReset={resetChecklist} />
         )}
       </div>
+
+      {/* Fast unsichtbarer Deko-Schrift-Zugang unten rechts. Bewusst KEIN
+          Lernmodul — nur eine Spielerei zum Angucken (Hinweis steht im Panel). */}
+      <CalligraphyPeek C={C} />
     </div>
+  );
+}
+
+// =====================================================
+//  Deko-Schrift-Vorschau ("Geheimoption", unten rechts)
+//  BEWUSST kein Lernmodul: zeigt bekannte Buchstaben/Woerter nur in
+//  geschwungenen Web-Schriften. Das ist KEIN echtes Thuluth — die
+//  kunstvolle Buchcover-Kalligrafie wird von Hand komponiert (Buchstaben
+//  gestapelt/verschachtelt) und laesst sich mit keiner Schriftart nachbauen.
+//  Darum klar als reine Spielerei gelabelt, nicht als Lektion.
+// =====================================================
+const CALLI_STYLES = [
+  { id: "ruqaa", label: "Geschwungen", family: "'Aref Ruqaa', serif" },
+  { id: "rakkas", label: "Kräftig", family: "'Rakkas', serif" },
+  { id: "kufi", label: "Eckig (Kufi)", family: "'Reem Kufi', sans-serif" },
+];
+
+function CalligraphyPeek({ C }) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("بِسْمِ اللَّهِ");
+  const [styleId, setStyleId] = useState("ruqaa");
+  const style = CALLI_STYLES.find((s) => s.id === styleId) || CALLI_STYLES[0];
+
+  // Deko-Schriften erst laden, wenn das Panel zum ersten Mal geoeffnet wird
+  // (spart Ladezeit fuer alle, die diese versteckte Funktion nie oeffnen).
+  useEffect(() => {
+    if (!open) return;
+    const ID = "calli-fonts-link";
+    if (document.getElementById(ID)) return;
+    const link = document.createElement("link");
+    link.id = ID;
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Rakkas&family=Reem+Kufi:wght@400..700&display=swap";
+    document.head.appendChild(link);
+  }, [open]);
+
+  return (
+    <>
+      {/* Ausloeser: klein, halbdurchsichtig, unten rechts, kaum zu bemerken */}
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Deko-Schrift anzeigen"
+        style={{
+          position: "fixed",
+          right: 8,
+          bottom: 8,
+          width: 30,
+          height: 30,
+          borderRadius: 15,
+          border: "none",
+          background: "transparent",
+          color: C.sub,
+          opacity: 0.12,
+          fontSize: 19,
+          lineHeight: 1,
+          cursor: "pointer",
+          zIndex: 40,
+          fontFamily: "'Amiri', serif",
+        }}
+      >
+        خ
+      </button>
+
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 18,
+            zIndex: 50,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: 460,
+              maxHeight: "90vh",
+              overflowY: "auto",
+              background: C.panel,
+              border: `1px solid ${C.line}`,
+              borderRadius: 18,
+              padding: 18,
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 4,
+              }}
+            >
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: C.ink }}>
+                Deko-Schrift
+              </h3>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Schließen"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: C.sub,
+                  fontSize: 24,
+                  lineHeight: 1,
+                  cursor: "pointer",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <p style={{ margin: "0 0 14px", fontSize: 12, color: C.sub, lineHeight: 1.55 }}>
+              Nur zum Angucken. Das ist eine geschwungene Web-Schrift, kein echtes
+              Thuluth — die kunstvolle Buchcover-Kalligrafie wird von Hand komponiert
+              und lässt sich mit keiner Schriftart nachbauen.
+            </p>
+
+            {/* Grosse Vorschau */}
+            <div
+              style={{
+                background: C.bg,
+                border: `1px solid ${C.line}`,
+                borderRadius: 14,
+                minHeight: 130,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "18px 14px",
+                marginBottom: 14,
+                direction: "rtl",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: style.family,
+                  color: C.gold,
+                  fontSize: 46,
+                  lineHeight: 1.5,
+                  textAlign: "center",
+                  wordBreak: "break-word",
+                }}
+              >
+                {text || "…"}
+              </div>
+            </div>
+
+            {/* Stil-Umschalter */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+              {CALLI_STYLES.map((s) => {
+                const active = s.id === styleId;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setStyleId(s.id)}
+                    style={{
+                      flex: 1,
+                      padding: "9px 6px",
+                      borderRadius: 10,
+                      border: `1px solid ${active ? C.gold : C.line}`,
+                      background: active ? "rgba(217,178,95,0.12)" : C.panel2,
+                      color: active ? C.gold : C.ink,
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Eingabe */}
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              dir="rtl"
+              placeholder="Wort eintippen…"
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "12px 14px",
+                borderRadius: 12,
+                border: `1px solid ${C.line}`,
+                background: C.panel2,
+                color: C.ink,
+                fontSize: 20,
+                fontFamily: "'Amiri', serif",
+                outline: "none",
+                marginBottom: 14,
+              }}
+            />
+
+            {/* Schnellauswahl: bekannte Buchstaben aus dem Trainer */}
+            <div style={{ fontSize: 11.5, color: C.sub, marginBottom: 6 }}>
+              Buchstaben antippen:
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {LETTERS.slice(0, 28).map((l) => (
+                <button
+                  key={l.key}
+                  onClick={() => setText(l.base)}
+                  aria-label={l.name}
+                  style={{
+                    minWidth: 34,
+                    padding: "6px 8px",
+                    borderRadius: 8,
+                    border: `1px solid ${C.line}`,
+                    background: C.panel2,
+                    color: C.ink,
+                    fontSize: 18,
+                    fontFamily: "'Amiri', serif",
+                    cursor: "pointer",
+                  }}
+                >
+                  {l.base}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
