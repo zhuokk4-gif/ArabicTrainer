@@ -3166,7 +3166,12 @@ function ReadingScreen({
   const arShown = arLive || item.ar;
   const arUnverified = isAyah && !arLive;
 
-  const long = arShown.length > 14;
+  // Schriftgroesse an item.ar bemessen, NICHT an arShown: item.ar ist fuer
+  // einen Vers immer gleich lang, arLive kommt erst asynchron dazu. Waere
+  // arShown die Grundlage, koennte die Schrift beim Nachladen kurz von 60px
+  // auf 34px (oder umgekehrt) springen, falls beide Texte unterschiedlich
+  // knapp an der 14-Zeichen-Grenze liegen — bei stabiler Basis passiert das nie.
+  const long = item.ar.length > 14;
 
   return (
     <div>
@@ -3351,21 +3356,28 @@ function ReadingScreen({
 
         {/* Ehrlichkeits-Hinweis: solange der geprüfte Text nicht da ist, steht
             hier der aus dem Gedaechtnis eingetragene. Das muss man sehen,
-            bevor man ihn auswendig lernt. */}
-        {arUnverified && (
-          <div
-            style={{
-              fontSize: 11.5,
-              color: deState === "error" ? C.red : C.sub,
-              marginBottom: 8,
-              lineHeight: 1.45,
-            }}
-          >
-            {deState === "loading"
-              ? "Geprüfter Text wird geladen…"
-              : "Ungeprüfter Text — geprüfte Fassung nicht geladen. Nicht auswendig lernen, bis sie da ist."}
-          </div>
-        )}
+            bevor man ihn auswendig lernt.
+            Immer im DOM (kein bedingtes Mounten): sobald arLive eintrifft,
+            faehrt die Zeile per CSS-Transition auf Hoehe 0 zusammen, statt
+            schlagartig zu verschwinden und alles darunter hochspringen zu
+            lassen — bei einem ersten Durchlauf durch viele Verse (jeder Vers
+            zuerst ungeprueft, dann bestaetigt) war genau das ein Wackler. */}
+        <div
+          style={{
+            fontSize: 11.5,
+            color: deState === "error" ? C.red : C.sub,
+            lineHeight: 1.45,
+            maxHeight: arUnverified ? 40 : 0,
+            marginBottom: arUnverified ? 8 : 0,
+            opacity: arUnverified ? 1 : 0,
+            overflow: "hidden",
+            transition: "max-height .25s ease, opacity .2s ease, margin-bottom .25s ease",
+          }}
+        >
+          {deState === "loading"
+            ? "Geprüfter Text wird geladen…"
+            : "Ungeprüfter Text — geprüfte Fassung nicht geladen. Nicht auswendig lernen, bis sie da ist."}
+        </div>
 
         {!(follow || revealed) ? (
           <div style={{ color: C.sub, fontSize: 14, marginTop: 6 }}>
@@ -3374,7 +3386,20 @@ function ReadingScreen({
         ) : (
           <div style={{ marginTop: 8 }}>
             <div style={{ color: C.gold, fontSize: 19, fontWeight: 700 }}>{item.tr}</div>
-            <div style={{ color: C.sub, fontSize: 14.5, marginTop: 4, lineHeight: 1.5 }}>
+            {/* Sanfte Überblendung statt hartem Text-Wechsel: dieselbe Zeile
+                bleibt im DOM (kein key, kein Remount), nur die Deckkraft
+                aendert sich waehrend des Ladens — kein erneutes "Pop" wie
+                beim frueheren Arabisch-Text-Bug. */}
+            <div
+              style={{
+                color: C.sub,
+                fontSize: 14.5,
+                marginTop: 4,
+                lineHeight: 1.5,
+                opacity: isAyah && deState === "loading" ? 0.45 : 1,
+                transition: "opacity .25s ease",
+              }}
+            >
               {isAyah
                 ? deState === "ok"
                   ? deText
@@ -3383,8 +3408,19 @@ function ReadingScreen({
                   : "Übersetzung nicht verfügbar (offline?)."
                 : item.de}
             </div>
-            {isAyah && deState === "ok" && (
-              <div style={{ color: C.sub, fontSize: 10.5, marginTop: 6, opacity: 0.65 }}>
+            {/* Zeile bleibt immer im Layout (Hoehe reserviert), nur die
+                Sichtbarkeit blendet ein -> kein Nachruecken des Pause-Buttons
+                darunter, wenn die Quelle fertig geladen ist. */}
+            {isAyah && (
+              <div
+                style={{
+                  color: C.sub,
+                  fontSize: 10.5,
+                  marginTop: 6,
+                  opacity: deState === "ok" ? 0.65 : 0,
+                  transition: "opacity .25s ease",
+                }}
+              >
                 {TRANS_CREDIT}
               </div>
             )}
