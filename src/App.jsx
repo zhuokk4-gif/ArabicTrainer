@@ -3298,8 +3298,15 @@ function ReadingScreen({
           </div>
         )}
 
+        {/* WICHTIG: key ist die Vers-IDENTITAET (surah-ayah), nicht der
+            angezeigte Text. Waere der Text der key, wuerde die Karte beim
+            Nachladen des geprueften Verstexts (arLive kommt asynchron nach)
+            neu gemountet -> die pop-Animation spielt mitten in der laufenden
+            Rezitation nochmal ab. Das sah wie ein Haenger/Neuladen aus, war
+            aber nur dieser Remount. Mit stabilem Key bleibt die Karte beim
+            Nachladen einfach stehen, der Text tauscht sich ohne Flackern. */}
         <div
-          key={arShown}
+          key={isAyah ? `${item.surah}-${item.ayah}` : item.ar}
           style={{
             fontFamily: fontStack,
             fontSize: long ? 34 : 60,
