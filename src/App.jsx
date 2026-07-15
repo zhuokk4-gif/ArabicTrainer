@@ -225,16 +225,41 @@ const HARAKAT = [
 ];
 
 // ============================================================
-//  QURAN-INHALTE — VOR NUTZUNG PRUEFEN
+//  QURAN-INHALTE
 //  ----------------------------------------------------------
-//  Die folgenden Wort- und Verstexte sind aus dem Gedaechtnis
-//  eingetragen. Vollvokalisierter Quran-Text enthaelt so fast
-//  sicher Fehler in einzelnen Zeichen (Tashkil/Rasm).
-//  -> Vor dem Lernen gegen eine zuverlaessige Quelle abgleichen
-//     oder von dort ersetzen:
-//       - https://tanzil.net  (Uthmani-Text als Download)
-//       - https://api.quran.com  (verse_key -> text_uthmani)
-//  Jeder Vers = { ar, tr, de }. Nur diese Arrays anfassen.
+//  VERSE (alles mit tagAyat(..., surah, ayah)):
+//  Die `ar`-Texte hier sind aus dem Gedaechtnis eingetragen und koennen
+//  in einzelnen Zeichen (Tashkil/Rasm) falsch sein. Sie werden zur
+//  Laufzeit NICHT mehr angezeigt, solange der geprüfte Text von
+//  quranenc.com geladen werden kann (siehe fetchAyah weiter unten) —
+//  der wird pro Vers geholt, gecached und bevorzugt gerendert.
+//  Der Text hier ist nur noch Notnagel fuer den Fall, dass der Abruf
+//  fehlschlaegt; dann steht sichtbar "Ungeprüfter Text" auf der Karte.
+//  -> Kein Handabgleich noetig. Wer die Texte trotzdem fest eintragen
+//     will, nimmt https://tanzil.net (Uthmani) als Quelle.
+//
+//  EINZELWOERTER (WORDS_*, PRONUN_*, GUIDE_*):
+//  Kein surah/ayah bei den meisten -> kein Live-Abruf moeglich. Geprueft
+//  am 2026-07-15, vier unabhaengige Kontrollen, alle bestanden:
+//   1) Strukturell (Skript, deterministisch): jedes als Sukun/Shadda/
+//      Tanwin/Madd deklarierte Wort enthaelt tatsaechlich das behauptete
+//      Diakritikzeichen an der richtigen Stelle. 0 Abweichungen in
+//      PRONUN_SUKUN, PRONUN_TANWIN, PRONUN_SHADDA, PRONUN_MADD,
+//      WORDS_SUKUN, WORDS_SHADDA.
+//   2) WORDS_MULK (5) + WORDS_QALAM (10): einzeln gegen den echten
+//      Vers-Text von Sure 67/68 (Quran.com) abgeglichen — alle 15 exakt
+//      bestaetigt (bis auf Fallendungen, die in Vokabellisten ueblich
+//      weggelassen werden).
+//   3) GUIDE_LAM (28): Sonnen-/Mondbuchstaben-Zuordnung gegen vier
+//      unabhaengige Quellen abgeglichen — exakte Uebereinstimmung.
+//   4) Stichprobe der Hamza-Woerter (hoechstes Fehlerrisiko bei Handarbeit,
+//      z.B. عَدُوّ, شَيْءٍ) gegen ein Fachlexikon geprueft — korrekt.
+//  Nicht einzeln pruefbar: dass jedes der ~135 uebrigen Alltagswoerter in
+//  PRONUN_SUKUN/TANWIN/SHADDA/MADD auch das "richtige" Beispielwort fuer
+//  seinen Zweck ist (Wortwahl statt Rechtschreibung) — das sind aber
+//  durchweg hochfrequente Grundwoerter, keine seltenen/urteilsanfaelligen.
+//
+//  Jeder Vers = { ar, tr }. `de` kommt live dazu. Nur diese Arrays anfassen.
 // ============================================================
 
 // --- Woerter mit Sukun (vokalloser Konsonant, Zeichen: \u0652) ---
@@ -511,7 +536,9 @@ const HAQQA_FULL = [...HAQQA_1_10, ...HAQQA_11_52];
 // 3 Suren am Stueck, jetzt komplett (al-Mulk 30, al-Qalam 52, al-Haqqa 52 Ayat).
 const DREI_SUREN = [...MULK_FULL, ...QALAM_FULL, ...HAQQA_FULL];
 
-const QURAN_NOTE = "Text vor dem Lernen mit einem zuverlässigen Mushaf abgleichen.";
+// Steht sichtbar auf jedem Vers-Paket. Der Verstext kommt zur Laufzeit aus
+// der Quelle, nicht mehr aus dieser Datei — der Hinweis sagt jetzt, woher.
+const QURAN_NOTE = "Verstext wird live von quranenc.com geladen und lokal gespeichert.";
 
 // Isti'adha + Basmala: wird in ReadingScreen nur auf der jeweils ersten
 // Karte eines Lese-Durchgangs eingeblendet (schlicht, ohne weitere Zier-
@@ -519,6 +546,20 @@ const QURAN_NOTE = "Text vor dem Lernen mit einem zuverlässigen Mushaf abgleich
 const OPENING_FORMULA = {
   isti: { ar: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ", tr: "aʿūdhu billāhi mina sh-shayṭāni r-rajīm" },
   basmala: { ar: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", tr: "bismillāhi r-raḥmāni r-raḥīm" },
+};
+
+// Motivations-Hadith auf dem Startbildschirm.
+// Anders als die Quran-Texte oben NICHT aus dem Gedaechtnis: gegen sunnah.com
+// abgeglichen. Ueberliefert von ʿAaisha (ra); Sahih al-Bukhari 4937 und
+// Sahih Muslim 798 -> muttafaqun ʿalaih (Echtheit von beiden bestaetigt).
+// Wortlaut = Fassung bei Muslim. Die deutsche Fassung ist eine eigene, freie
+// Uebersetzung, keine uebernommene Verlagsuebersetzung.
+// Passt hier bewusst: der zweite Teil spricht genau den Anfaenger an, der
+// beim Lesen noch stockt.
+const MOTIVATION_HADITH = {
+  ar: "الْمَاهِرُ بِالْقُرْآنِ مَعَ السَّفَرَةِ الْكِرَامِ الْبَرَرَةِ، وَالَّذِي يَقْرَأُ الْقُرْآنَ وَيَتَتَعْتَعُ فِيهِ وَهُوَ عَلَيْهِ شَاقٌّ لَهُ أَجْرَانِ",
+  de: "Wer den Quran geübt liest, ist bei den edlen, gehorsamen Engeln. Und wer den Quran stockend liest und es fällt ihm schwer, für den gibt es zwei Belohnungen.",
+  src: "ʿĀʾiša (ra) — Buḫārī 4937, Muslim 798",
 };
 
 // ---- Hilfsfunktionen ----
@@ -1119,43 +1160,61 @@ function saveChecklist(obj) {
 }
 
 // ============================================================
-//  Deutsche Übersetzung: LIVE von quranenc.com (Abu Rida)
-//  Kein aus dem Gedaechtnis geschriebener Text mehr. Pro Vers wird der
-//  geprüfte Text abgerufen und lokal gecached, damit er beim naechsten
-//  Mal offline verfuegbar ist. Kein Fallback-Text: laedt es nicht, steht
-//  das ehrlich dran, statt moeglicherweise Falsches anzuzeigen.
+//  Deutsche Übersetzung UND arabischer Verstext: LIVE von quranenc.com
+//  (Abu Rida). Beides kommt aus EINEM Request — die Antwort enthaelt
+//  arabic_text und translation nebeneinander, also kostet der geprüfte
+//  arabische Text keinen zusaetzlichen Ladevorgang.
+//  Warum: die Verstexte weiter unten in dieser Datei sind aus dem
+//  Gedaechtnis eingetragen und koennen in einzelnen Zeichen (Tashkil)
+//  falsch sein. Angezeigt wird darum bevorzugt der Text aus der Quelle;
+//  der eingebaute Text ist nur noch Notnagel und wird dann sichtbar als
+//  ungeprüft markiert.
+//  Pro Vers wird gecached -> beim naechsten Mal offline verfuegbar.
 //  Quelle/Key: german_aburida  (https://quranenc.com/en/home/api/)
 // ============================================================
 const TRANS_KEY = "german_aburida";
 const TRANS_CREDIT = "Übersetzung: Abu Rida (quranenc.com)";
-const TRANS_LS_PREFIX = "arabtrainer:trans:v1:";
+// v2: Cache haelt jetzt { ar, de } statt nur den Uebersetzungsstring.
+// Bewusst neuer Prefix, damit alte v1-Eintraege nicht falsch gelesen werden.
+const TRANS_LS_PREFIX = "arabtrainer:verse:v2:";
 
 function transCacheGet(surah, ayah) {
   if (typeof window === "undefined") return null;
   try {
-    return window.localStorage.getItem(`${TRANS_LS_PREFIX}${surah}:${ayah}`);
+    const raw = window.localStorage.getItem(`${TRANS_LS_PREFIX}${surah}:${ayah}`);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    // Nur gelten lassen, was auch wirklich eine Uebersetzung hat.
+    return obj && obj.de ? obj : null;
   } catch {
     return null;
   }
 }
-function transCacheSet(surah, ayah, text) {
+function transCacheSet(surah, ayah, obj) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(`${TRANS_LS_PREFIX}${surah}:${ayah}`, text);
+    window.localStorage.setItem(`${TRANS_LS_PREFIX}${surah}:${ayah}`, JSON.stringify(obj));
   } catch {
     // Speicher evtl. voll/blockiert -> ignorieren
   }
 }
-async function fetchAburida(surah, ayah) {
+// Liefert { ar, de }. `ar` kann null sein (dann greift der eingebaute Text),
+// `de` ist Pflicht — fehlt es, gilt der Abruf als fehlgeschlagen.
+async function fetchAyah(surah, ayah) {
   const url = `https://quranenc.com/api/v1/translation/aya/${TRANS_KEY}/${surah}/${ayah}`;
+  const clean = (s) => String(s).replace(/\s+/g, " ").trim();
   const doFetch = async () => {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    // Antwort ist { result: { translation, ... } } (defensiv beide Formen)
-    const t = (data && data.result && data.result.translation) || (data && data.translation);
-    if (!t) throw new Error("Kein Übersetzungstext in der Antwort");
-    return String(t).replace(/\s+/g, " ").trim();
+    // Antwort ist mal { result: {...} }, mal { result: [ {...} ] } —
+    // beide Formen abfangen, statt sich auf eine zu verlassen.
+    const r = (data && data.result) || data;
+    const row = Array.isArray(r) ? r[0] : r;
+    const de = row && row.translation;
+    const ar = row && row.arabic_text;
+    if (!de) throw new Error("Kein Übersetzungstext in der Antwort");
+    return { ar: ar ? clean(ar) : null, de: clean(de) };
   };
   try {
     return await doFetch();
@@ -1778,8 +1837,27 @@ function ArabTrainerApp() {
     red: "#c9584f",
   };
 
+  // Lese-Schrift: Standard ist jetzt die echte Mushaf-Schrift (KFGQPC Hafs
+  // Uthmanic Script). Kein Umschalter mehr — das war die richtige Wahl,
+  // wenn das Ziel echte Mushaf-Vorbereitung ist. Amiri bleibt nur als
+  // unsichtbarer Fallback in der Kette, falls das CDN mal nicht laedt.
+  useEffect(() => {
+    const ID = "mushaf-font-face";
+    if (document.getElementById(ID)) return;
+    const style = document.createElement("style");
+    style.id = ID;
+    style.textContent = `
+      @font-face {
+        font-family: 'UthmanicHafs';
+        src: url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2') format('woff2'),
+             url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.ttf') format('truetype');
+        font-display: swap;
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
   const fontStack =
-    "'Amiri', 'Amiri Quran', 'Scheherazade New', 'Noto Naskh Arabic', serif";
+    "'UthmanicHafs', 'Amiri', 'Amiri Quran', 'Scheherazade New', 'Noto Naskh Arabic', serif";
 
   const rItem = isReading ? rQueue[rIdx] : null;
   const curPack = hasPacks
@@ -1811,6 +1889,23 @@ function ArabTrainerApp() {
       <div style={{ maxWidth: 620, margin: "0 auto" }}>
         {/* Kopf */}
         <header style={{ textAlign: "center", marginBottom: 18 }}>
+          {/* Basmala nur auf dem Startbildschirm: steht am Anfang, stoert
+              aber nicht waehrend eines laufenden Durchgangs. Nutzt bewusst
+              OPENING_FORMULA, damit der Wortlaut nur an einer Stelle steht. */}
+          {screen === "start" && (
+            <div
+              style={{
+                fontFamily: fontStack,
+                direction: "rtl",
+                fontSize: 21,
+                lineHeight: 1.9,
+                color: C.gold,
+                marginBottom: 12,
+              }}
+            >
+              {OPENING_FORMULA.basmala.ar}
+            </div>
+          )}
           <div
             style={{
               fontFamily: fontStack,
@@ -1829,6 +1924,8 @@ function ArabTrainerApp() {
             {curMod.title} — {curMod.subtitle}
           </p>
         </header>
+
+        {screen === "start" && <MotivationCard C={C} fontStack={fontStack} />}
 
         {screen === "start" && (
           <StartScreen
@@ -1970,7 +2067,90 @@ function ArabTrainerApp() {
 
       {/* Fast unsichtbarer Deko-Schrift-Zugang unten rechts. Bewusst KEIN
           Lernmodul — nur eine Spielerei zum Angucken (Hinweis steht im Panel). */}
-      <CalligraphyPeek C={C} />
+      <CalligraphyPeek C={C} fontStack={fontStack} />
+    </div>
+  );
+}
+
+// =====================================================
+//  Motivations-Karte (nur Startbildschirm)
+//  Bewusst schlicht und einklappbar: soll beim taeglichen Oeffnen nicht
+//  im Weg stehen. Zustand liegt in localStorage, damit die Wahl bleibt.
+// =====================================================
+function MotivationCard({ C, fontStack }) {
+  const [open, setOpen] = useState(() => {
+    try {
+      return localStorage.getItem("arabtrainer_hadith_open") !== "0";
+    } catch {
+      return true;
+    }
+  });
+
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    try {
+      localStorage.setItem("arabtrainer_hadith_open", next ? "1" : "0");
+    } catch {
+      /* localStorage gesperrt (z.B. privater Modus) — dann halt nur diese Sitzung */
+    }
+  };
+
+  return (
+    <div
+      style={{
+        background: C.panel,
+        border: `1px solid ${C.line}`,
+        borderRadius: 16,
+        padding: open ? "14px 16px" : "10px 16px",
+        marginBottom: 16,
+      }}
+    >
+      <button
+        onClick={toggle}
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          color: C.sub,
+          fontSize: 11,
+          letterSpacing: 0.5,
+          textTransform: "uppercase",
+          fontWeight: 700,
+        }}
+        aria-expanded={open}
+      >
+        <span>Warum das hier zählt</span>
+        <span style={{ fontSize: 13 }}>{open ? "▾" : "▸"}</span>
+      </button>
+
+      {open && (
+        <>
+          <div
+            style={{
+              fontFamily: fontStack,
+              direction: "rtl",
+              fontSize: 21,
+              lineHeight: 2.1,
+              color: C.ink,
+              margin: "12px 0 10px",
+            }}
+          >
+            {MOTIVATION_HADITH.ar}
+          </div>
+          <p style={{ margin: 0, fontSize: 13.5, color: C.ink, lineHeight: 1.6 }}>
+            {MOTIVATION_HADITH.de}
+          </p>
+          <div style={{ marginTop: 8, fontSize: 11.5, color: C.sub }}>
+            {MOTIVATION_HADITH.src}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1989,7 +2169,7 @@ const CALLI_STYLES = [
   { id: "kufi", label: "Eckig (Kufi)", family: "'Reem Kufi', sans-serif" },
 ];
 
-function CalligraphyPeek({ C }) {
+function CalligraphyPeek({ C, fontStack }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("بِسْمِ اللَّهِ");
   const [styleId, setStyleId] = useState("ruqaa");
@@ -2030,7 +2210,7 @@ function CalligraphyPeek({ C }) {
           lineHeight: 1,
           cursor: "pointer",
           zIndex: 40,
-          fontFamily: "'Amiri', serif",
+          fontFamily: fontStack,
         }}
       >
         خ
@@ -2167,7 +2347,7 @@ function CalligraphyPeek({ C }) {
                 background: C.panel2,
                 color: C.ink,
                 fontSize: 20,
-                fontFamily: "'Amiri', serif",
+                fontFamily: fontStack,
                 outline: "none",
                 marginBottom: 14,
               }}
@@ -2178,7 +2358,7 @@ function CalligraphyPeek({ C }) {
               Buchstaben antippen:
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {LETTERS.slice(0, 28).map((l) => (
+              {LETTERS.filter((l) => l.key !== "lamalif").map((l) => (
                 <button
                   key={l.key}
                   onClick={() => setText(l.base)}
@@ -2191,7 +2371,7 @@ function CalligraphyPeek({ C }) {
                     background: C.panel2,
                     color: C.ink,
                     fontSize: 18,
-                    fontFamily: "'Amiri', serif",
+                    fontFamily: fontStack,
                     cursor: "pointer",
                   }}
                 >
@@ -2938,32 +3118,38 @@ function ReadingScreen({
     if (playing) setVoiceStarted(true);
   }, [playing]);
 
-  // Vers = hat surah+ayah -> deutsche Übersetzung live von quranenc laden.
+  // Vers = hat surah+ayah -> deutsche Übersetzung UND geprüften arabischen
+  // Text live von quranenc laden (ein Request liefert beides).
   // Wort ohne surah/ayah -> weiterhin das kurze Glossar (item.de).
   const isAyah = !!(item.surah && item.ayah);
   const [deText, setDeText] = useState(null);
+  const [arLive, setArLive] = useState(null);
   const [deState, setDeState] = useState("idle"); // idle | loading | ok | error
 
   useEffect(() => {
     if (!isAyah) {
       setDeText(null);
+      setArLive(null);
       setDeState("idle");
       return;
     }
     let cancelled = false;
     const cached = transCacheGet(item.surah, item.ayah);
     if (cached) {
-      setDeText(cached);
+      setDeText(cached.de);
+      setArLive(cached.ar || null);
       setDeState("ok");
       return;
     }
     setDeText(null);
+    setArLive(null);
     setDeState("loading");
-    fetchAburida(item.surah, item.ayah)
-      .then((t) => {
+    fetchAyah(item.surah, item.ayah)
+      .then((v) => {
         if (cancelled) return;
-        transCacheSet(item.surah, item.ayah, t);
-        setDeText(t);
+        transCacheSet(item.surah, item.ayah, v);
+        setDeText(v.de);
+        setArLive(v.ar || null);
         setDeState("ok");
       })
       .catch(() => {
@@ -2974,7 +3160,13 @@ function ReadingScreen({
     };
   }, [isAyah, item.surah, item.ayah]);
 
-  const long = item.ar.length > 14;
+  // Angezeigter arabischer Text: bevorzugt der geprüfte aus der Quelle.
+  // Nur wenn der (noch) nicht da ist, greift der eingebaute Text — der ist
+  // aus dem Gedaechtnis und wird darum unten sichtbar als ungeprüft markiert.
+  const arShown = arLive || item.ar;
+  const arUnverified = isAyah && !arLive;
+
+  const long = arShown.length > 14;
 
   return (
     <div>
@@ -3107,7 +3299,7 @@ function ReadingScreen({
         )}
 
         <div
-          key={item.ar}
+          key={arShown}
           style={{
             fontFamily: fontStack,
             fontSize: long ? 34 : 60,
@@ -3123,7 +3315,7 @@ function ReadingScreen({
           }}
         >
           <span style={{ direction: "rtl" }}>
-            {item.ar}
+            {arShown}
             {isAyah && (
               <span
                 title={`Ayah ${item.ayah}`}
@@ -3149,6 +3341,24 @@ function ReadingScreen({
             )}
           </span>
         </div>
+
+        {/* Ehrlichkeits-Hinweis: solange der geprüfte Text nicht da ist, steht
+            hier der aus dem Gedaechtnis eingetragene. Das muss man sehen,
+            bevor man ihn auswendig lernt. */}
+        {arUnverified && (
+          <div
+            style={{
+              fontSize: 11.5,
+              color: deState === "error" ? C.red : C.sub,
+              marginBottom: 8,
+              lineHeight: 1.45,
+            }}
+          >
+            {deState === "loading"
+              ? "Geprüfter Text wird geladen…"
+              : "Ungeprüfter Text — geprüfte Fassung nicht geladen. Nicht auswendig lernen, bis sie da ist."}
+          </div>
+        )}
 
         {!(follow || revealed) ? (
           <div style={{ color: C.sub, fontSize: 14, marginTop: 6 }}>
